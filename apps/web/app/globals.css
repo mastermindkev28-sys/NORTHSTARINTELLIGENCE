@@ -1,0 +1,93 @@
+@import 'tailwindcss';
+
+/* Northstar design tokens. Palette from docs/BRAND_GUIDELINES.md (brief section 04). */
+@theme {
+  --color-obsidian: #10151e;
+  --color-graphite: #1b2533;
+  --color-graphite-2: #233042;
+  --color-line: #2b3a4f;
+  --color-titanium: #dce4ee;
+  --color-muted: #8d9bb0;
+  --color-arctic: #f7f9fc;
+  --color-signal: #5689ff;
+  --color-signal-deep: #3f6fe6;
+  --color-positive: #3ec59a;
+  --color-caution: #e9b44c;
+  --color-critical: #ef6b6b;
+
+  --font-sans: var(--font-geist-sans), 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  html,
+  body {
+    background: var(--color-obsidian);
+    color: var(--color-titanium);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'ss01', 'cv11';
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--color-signal) 35%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer components {
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .panel {
+    background: var(--color-graphite);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+  }
+  .fade-in {
+    animation: fade-in 180ms ease-out both;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in {
+    animation: none;
+  }
+}
