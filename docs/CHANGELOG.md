@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 (unreleased) — Discover and multi-strategy underwriting
+
+### Added
+- **Underwriting engine 1.1.0**: BRRRR (capital recycling, refinance, stabilized returns), creative finance (seller financing with balloon, subject-to, wrap, lease option; due-on-sale, lending-compliance, and legal-review flags; unverified loan terms are critical), Section 8 (HUD benchmark vs PHA payment standard vs contract rent; never guaranteed; not for tenant screening), small multifamily rent roll with in-place vs pro-forma. 30 tests.
+- **`@northstar/discover`**: CountyConnector contract; Socrata, ArcGIS, and Carto connectors; pilot registry (Philadelphia, Cook, Cuyahoga) with license metadata; address/APN/name normalization; entity resolution with confidence and review queue; append-only event lifecycle with expiry; idempotent ingestion; three separate scores (property signal, data confidence, strategy fit) with buy boxes and investor profiles. 58 tests.
+- **Migration 0003** (ADR-015): global `discover` schema written only by `northstar_ingest`, license-gated reads, append-only records and events; tenant investor profiles, buy boxes, saved searches, watchlists. 12 DB tests.
+- **Shared** `INVESTMENT_STRATEGIES` in `@northstar/core`, matching `app.investment_strategy`.
+- **Docs**: DISCOVER_ARCHITECTURE, ADR-015, schema/methodology/catalog/testing updates.
+
 ## 0.1.0 (unreleased) — Platform foundation
 
 ### Added

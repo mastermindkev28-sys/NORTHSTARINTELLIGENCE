@@ -8,17 +8,19 @@
 | Property-based invariants | Vitest + seeded PRNG | `packages/underwriting/test/properties.test.ts` | Linearity of MAO, amortization identities, IRR root property, NOI/cash-flow identities, determinism over hundreds of random deals (seeded, so failures reproduce) |
 | Reconciliation tests | Vitest | `report.test.ts`, `wholesale.test.ts` | Cost stack reconciles to MAO; max supportable fee leaves the buyer exactly at minimum margin; report determinism and fingerprint stability |
 | Platform unit tests | Vitest | `packages/core/test`, `packages/integrations/test` | Password hashing and hostile inputs, tokens, RBAC parity with SQL, redaction, rate limiting, webhook tampering/replay/rotation, provider mapping and error handling with stubbed HTTP, messaging compliance gate |
-| Database integration and security | Vitest + real PostgreSQL | `packages/db/test/rls.test.ts` | Tenant isolation, authorization boundaries, concurrency, connection reuse, audit immutability, session validity, migration integrity |
+| Discover | Vitest | `packages/discover/test` | Connectors against stubbed HTTP (paging, errors, injection guards, license refusal), pilot mappings, normalization, entity resolution thresholds and ties, event lifecycle and expiry, idempotent ingestion, score determinism and separation |
+| Database integration and security | Vitest + real PostgreSQL | `packages/db/test/rls.test.ts`, `discover.test.ts` | Tenant isolation, authorization boundaries, concurrency, connection reuse, audit immutability, session validity, migration integrity |
 | End-to-end | Playwright | `apps/web/e2e/smoke.mjs` | Real browser, production build, real database: auth gate, sign-up, live calculation, save, report, finalize, rental, audit, cross-tenant 404, sign-out, bad password |
 
 ## Current results (2026-11-10)
 
 | Suite | Tests | Result |
 |---|---|---|
-| underwriting | 103 | pass, 99.4% statements, 94.2% branches |
-| core | 20 | pass |
+| underwriting | 133 | pass, 99.1% statements, 92.7% branches |
+| core | 21 | pass |
+| discover | 58 | pass, 96.7% statements |
 | integrations | 26 | pass |
-| db (real Postgres 16) | 35 | pass |
+| db (real Postgres 16) | 47 | pass |
 | e2e smoke (production build) | 9 checks | pass |
 
 ## How to run

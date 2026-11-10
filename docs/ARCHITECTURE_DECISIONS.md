@@ -143,3 +143,17 @@ Vendor pricing and limits quoted here reflect public information at the time of 
 ## ADR-014: AI agents call deterministic tools; they never compute financial results
 
 **Decision.** Claude (Anthropic API, tool use, structured outputs) orchestrates and interprets; numbers come only from the underwriting library and provider adapters exposed as tools. Any AI-extracted value enters the engine tagged `ai_interpretation`, which the engine surfaces in warnings and reports until a human verifies it. Agents get task-scoped permissions and require human approval for binding offers, contracts, spending, outbound campaigns, and destructive changes.
+
+## ADR-015: Public records are global reference data; customer work stays tenant-scoped
+
+**Context.** Northstar Discover ingests county public records (assessor, recorder, tax, code enforcement, foreclosure). These facts are the same for every customer, but buy boxes, watchlists, and saved searches are private to each organization. Source terms differ: some permit commercial display, some say nothing, some prohibit automated access.
+
+**Decision.**
+- Global records live in a separate `discover` schema, stored once: county source registry, ingestion runs, parcels, append-only source record versions, record-to-parcel links, a human match-review queue, and append-only property event versions.
+- Only the `northstar_ingest` role (NOLOGIN, NOBYPASSRLS) writes global tables. The web app role can only read them, and only as an active member of the request's organization. Records, links, and events are readable only when the source's license permits customer display (`discover.source_displayable`), enforced in RLS rather than in application code.
+- A source whose terms prohibit automated access can be listed but can never be enabled (check constraint), and no connector can be constructed for it.
+- Customer data that refers to public records (`watchlist_items`, `buy_boxes`, `saved_searches`, `investor_profiles`) is ordinary tenant data under ADR-003 policies.
+- Entity resolution links a record to a parcel automatically only at confidence ≥ 0.85 (check constraint); anything lower is either linked by a person or queued in `match_reviews`.
+- Three scores stay separate (property signal, data confidence, strategy fit). No combined "opportunity score" exists in code or schema. Signal types describe properties and their records only; there are no personal vulnerability or protected-characteristic signals.
+
+**Consequences.** One ingest serves all tenants, and license gating is uniform. Staff review tooling for `match_reviews` and per-tenant private overlays (a customer's own notes on a parcel) are follow-ups. Market Intelligence (0005) reuses `app.investment_strategy` and `northstar_ingest`, created idempotently by both migrations.

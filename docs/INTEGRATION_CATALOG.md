@@ -17,6 +17,22 @@ Contract: `PropertyDataProvider` (getProperty, getOwner, getSalesHistory, getCom
 | BatchData | Planned | — | Later: liens, skip trace |
 | MLS (RESO Web API via licensed partner) | Planned | — | Not v1; requires broker/MLS licensing |
 
+## County public records (`@northstar/discover`)
+
+Contract: `CountyConnector`. Details: docs/DISCOVER_ARCHITECTURE.md. Mappings follow published data dictionaries and are unverified against live responses (the build environment cannot reach the portals).
+
+| Source | Status | Credential | Notes |
+|---|---|---|---|
+| Demo county | Built | none | Synthetic, `demo: true`, FIPS 00000 |
+| Philadelphia RTT summary (Carto) | Built | none | Deeds, mortgages, sheriff deeds, assignments, satisfactions; City of Philadelphia License |
+| Philadelphia L&I violations (Carto) | Built | none | Open/closed mapped to active/resolved |
+| Philadelphia OPA properties (Carto) | Planned | none | Parcel spine |
+| Cook parcel sales (Socrata `wvhk-k5uv`) | Built | optional `SOCRATA_APP_TOKEN` | No license stated: evaluation only, hidden from customers |
+| Cook tax sale (Socrata `55ju-2fs9`) | Planned | optional `SOCRATA_APP_TOKEN` | |
+| Cuyahoga parcels (ArcGIS) | Planned | none | Sheriff sale statuses have no API |
+| HUD FMR/SAFMR API | Planned | `HUD_API_TOKEN` (free account) | `huduser.gov/hudapi/public/fmr`; PHA payment standards curated from PDFs |
+| ICE / ATTOM premium | Planned | provider key | Fallback for tax delinquency, probate, lis pendens |
+
 ## Messaging (`@northstar/integrations/messaging`)
 
 | Provider | Status | Credential | Notes |

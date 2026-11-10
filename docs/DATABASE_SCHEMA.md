@@ -59,7 +59,22 @@ All tables: `org_id NOT NULL`, FORCE RLS, standard policy set from `app.apply_te
 
 **usage_events**: `meter` (dotted), `quantity > 0`, `idempotency_key` (unique per org), `metadata`, `occurred_at`. Insert/select only for the app role.
 
-## Invariants proven by tests (`packages/db/test/rls.test.ts`)
+### Discover (0003, ADR-015)
+
+**Global reference data (schema `discover`)**: written only by `northstar_ingest`; members of the request's organization may read. FORCE RLS on every table.
+
+- **county_sources**: `source_key` (e.g. `phl.rtt_summary`), state, `county_fips`, category, platform (`socrata|arcgis|carto|bulk|licensed|manual|demo`), status (`planned|built|verified|disabled`), `mapping_verified`, license fields (`license_tag`, `automated_access`, `commercial_display`, `attribution_required`, `license_reviewed_on`). A prohibited source cannot be `built`/`verified`; `verified` requires `mapping_verified` and `verified_on`.
+- **ingestion_runs**: per-run status and counts (fetched, inserted, unchanged, matched, queued for review, events appended, anomalies), resume cursor, error. Internal.
+- **parcels**: state, `county_fips`, `apn`/`apn_normalized` (unique per county), normalized address and `address_key`, ZIP, optional lat/lon.
+- **source_records**: append-only versions per (`source_key`, `source_record_id`), `content_hash` (re-ingesting identical content is a no-op), `instrument jsonb` (generic: type, number/book/page, recorded and instrument dates, parties with roles, consideration, APN), `attributes`, `license_tag`, `is_demo`. Mortgage consideration is the original recorded amount, never a current balance.
+- **record_links**: record → parcel with `confidence`, reasons, `method` (`auto` requires ≥ 0.85; lower needs `human`).
+- **match_reviews**: uncertain matches with candidates, one open review per record; a decision must set `decided_at`, and `linked` must name a parcel. Internal.
+- **property_events**: append-only versions (`event_type` from `discover.signal_type`, `status` from `discover.event_status`, event/filed/scheduled dates, amount, `discovered_at`, `supersedes_version` = version − 1, `origin` `source|expiry_rule`, `anomaly`). View `current_property_events` returns the latest version with its parcel link.
+- Records, links, and events are visible to members only when the source's `commercial_display` is `permitted` (or the source is demo).
+
+**Tenant tables (standard policies)**: `investor_profiles` (experience, capital, financing list, risk tolerance, hold years, strategies), `buy_boxes` (strategies `app.investment_strategy[]`, criteria jsonb, optional same-org profile), `saved_searches` (filters, alert cadence), `watchlist_items` (unique per org + parcel).
+
+## Invariants proven by tests (`packages/db/test/rls.test.ts`, `discover.test.ts`)
 
 - App role is not superuser, not owner, `NOBYPASSRLS`; every public table has RLS enabled and forced.
 - No context → zero rows from every table and no inserts.
@@ -68,6 +83,7 @@ All tables: `org_id NOT NULL`, FORCE RLS, standard policy set from `app.apply_te
 - Role matrix (viewer read-only, analyst no delete, audit owner/admin only, membership management, owner grant, last-owner guard, suspended members lose access).
 - Audit is automatic, records request ids and changed columns, is append-only even for the owner, and cannot be forged.
 - Finalized analyses are immutable; sessions resolve only when valid; sign-up is atomic; metering is idempotent per org.
+- Discover: members cannot write global tables or read internal ones; anonymous or forged-org sessions see no global data; non-displayable sources are invisible; records and events are append-only even for the owner; version chains, the auto-link threshold, license constraints, and review decisions are enforced; the strategy enum matches the TypeScript list; buy boxes, profiles, searches, and watchlists are tenant-isolated.
 
 ## Conventions for new tables
 
