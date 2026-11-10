@@ -148,7 +148,22 @@ Inputs to collect: team counts per metro (from cash-buyer and assignment data in
 
 ---
 
-## 9. Open research questions (next actions)
+## 9. Expanded scope: multi-strategy investors (Discover addendum, 2026-11-10)
+
+The owner's addendum broadens the platform beyond wholesaling. Wholesalers and acquisition teams remain the **commercial entry point**; the segments below shape architecture and later packaging. We have not yet sized or interviewed these segments, so everything here is a hypothesis.
+
+| Segment | What they need from Northstar | Data dependency |
+|---|---|---|
+| Beginners (any strategy) | Guided onboarding, preset templates, plain-language explanations | Same as below, with conservative defaults |
+| Fix-and-flip operators | ARV, rehab budget, holding and financing costs, net profit and ROI | Comps, permits (BatchData add-on, county permit data) |
+| Buy-and-hold / BRRRR investors | Rent estimates, operating expenses, DSCR, refinance scenarios | Rent AVM and comps (RentCast), tax and insurance inputs |
+| Creative-finance investors | Existing-loan analysis from **uploaded documents**; due-on-sale and lien flags | Recorded mortgages give history only, never current balance or terms |
+| Section 8 / HCV investors | Gross rent benchmarks vs. costs | HUD FMR/SAFMR API, per-PHA payment standard PDFs (`PUBLIC_RECORDS_SOURCE_INVENTORY.md` §4) |
+| Small multifamily | Unit-level rent rolls, NOI, cap rate, debt service | Rent rolls (uploaded), rent comps |
+
+Competitive note (needs a proper pass): DealCheck already serves multi-strategy rental and flip analysis for individuals (`COMPETITIVE_ANALYSIS.md`), and PropIntel markets AI property intelligence from county tax, code violation and lien records in five metros. Northstar's differentiation stays the same: verifiable records, source permissions, and transparent strategy-specific models.
+
+## 10. Open research questions (next actions)
 
 1. Run 15 to 20 discovery interviews with Segment B/D operators (script in `GO_TO_MARKET.md`).
 2. Measure baseline speed-to-lead and lead-to-contract rates for 3 to 5 design partners.
