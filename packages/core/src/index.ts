@@ -5,4 +5,5 @@ export * from './logger';
 export * from './rate-limit';
 export * from './webhooks';
 export * from './slug';
+export * from './strategies';
 export * from './validation';

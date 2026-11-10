@@ -212,3 +212,13 @@ describe('validation → engine', () => {
     expect(cash.rental.loan).toBeUndefined();
   });
 });
+
+import { INVESTMENT_STRATEGIES, STRATEGY_LABELS, isInvestmentStrategy } from '../src/strategies';
+describe('investment strategies', () => {
+  it('matches the shared enum order and labels every strategy', () => {
+    expect(INVESTMENT_STRATEGIES).toEqual(['wholesale', 'fix_and_flip', 'buy_and_hold', 'brrrr', 'creative_finance', 'section_8', 'small_multifamily', 'land', 'commercial']);
+    for (const s of INVESTMENT_STRATEGIES) expect(STRATEGY_LABELS[s]).toBeTruthy();
+    expect(isInvestmentStrategy('brrrr')).toBe(true);
+    expect(isInvestmentStrategy('flip')).toBe(false);
+  });
+});
