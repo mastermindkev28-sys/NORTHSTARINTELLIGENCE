@@ -15,6 +15,7 @@ const ADMIN_URL = process.env.TEST_DATABASE_ADMIN_URL ?? 'postgres://postgres@lo
 const DB_NAME = `northstar_test_${process.pid}`;
 const APP_ROLE = 'northstar_test_app';
 const APP_PASSWORD = 'test-only-password';
+const INGEST_ROLE = 'northstar_test_ingest';
 
 export default async function setup(project: TestProject) {
   const admin = new pg.Client({ connectionString: ADMIN_URL });
@@ -31,11 +32,16 @@ export default async function setup(project: TestProject) {
   if (exists.rowCount === 0) {
     await admin.query(`create role ${APP_ROLE} login nobypassrls password '${APP_PASSWORD}'`);
   }
+  const ingestExists = await admin.query('select 1 from pg_roles where rolname = $1', [INGEST_ROLE]);
+  if (ingestExists.rowCount === 0) {
+    await admin.query(`create role ${INGEST_ROLE} login nobypassrls password '${APP_PASSWORD}'`);
+  }
   const ownerUrl = withDb(ADMIN_URL, DB_NAME);
   await migrate(ownerUrl, MIGRATIONS_DIR);
   const owner = new pg.Client({ connectionString: ownerUrl });
   await owner.connect();
   await owner.query(`grant northstar_app to ${APP_ROLE}`);
+  await owner.query(`grant northstar_ingest to ${INGEST_ROLE}`);
   await owner.end();
 
   const appUrl = new URL(ownerUrl);
@@ -44,6 +50,10 @@ export default async function setup(project: TestProject) {
   project.provide('dbAvailable', true);
   project.provide('ownerUrl', ownerUrl);
   project.provide('appUrl', appUrl.toString());
+  const ingestUrl = new URL(ownerUrl);
+  ingestUrl.username = INGEST_ROLE;
+  ingestUrl.password = APP_PASSWORD;
+  project.provide('ingestUrl', ingestUrl.toString());
 
   return async () => {
     await admin.query(`drop database if exists ${DB_NAME} with (force)`);
@@ -62,5 +72,6 @@ declare module 'vitest' {
     dbAvailable: boolean;
     ownerUrl: string;
     appUrl: string;
+    ingestUrl: string;
   }
 }

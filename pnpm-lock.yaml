@@ -92,6 +92,15 @@ importers:
         specifier: 4.20.6
         version: 4.20.6
 
+  packages/discover:
+    dependencies:
+      '@northstar/core':
+        specifier: workspace:*
+        version: link:../core
+      '@northstar/underwriting':
+        specifier: workspace:*
+        version: link:../underwriting
+
   packages/integrations: {}
 
   packages/underwriting:

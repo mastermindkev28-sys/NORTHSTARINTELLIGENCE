@@ -10,7 +10,7 @@
  *     presentation boundaries via `roundCurrency`, so chained calculations do not accumulate rounding error.
  */
 
-export const ENGINE_VERSION = '1.0.0';
+export const ENGINE_VERSION = '1.1.0';
 
 /** Where a number came from. Mirrors the five classes required by the operating brief, section 11. */
 export type InputSource =

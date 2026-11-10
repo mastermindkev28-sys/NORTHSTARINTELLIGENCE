@@ -1,0 +1,17 @@
+{
+  "name": "@northstar/discover",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Northstar Discover: county public-record connectors, normalization, entity resolution, property events, and separate signal/confidence/fit scores.",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "tsc -p tsconfig.json --noUnusedLocals --noUnusedParameters",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@northstar/core": "workspace:*",
+    "@northstar/underwriting": "workspace:*"
+  }
+}

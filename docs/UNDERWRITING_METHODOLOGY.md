@@ -1,6 +1,6 @@
 # Underwriting Methodology
 
-Engine: `@northstar/underwriting` v1.0.0 (`packages/underwriting`). All functions are pure and deterministic. Rates are decimals inside the engine (0.07 = 7%); the UI accepts percentages and converts them in `@northstar/core/validation`.
+Engine: `@northstar/underwriting` v1.1.0 (`packages/underwriting`). All functions are pure and deterministic. Rates are decimals inside the engine (0.07 = 7%); the UI accepts percentages and converts them in `@northstar/core/validation`.
 
 > **Limitations.** Results are calculations on stated inputs. They are not appraisals, not guaranteed valuations, and not predictions of investment outcomes. ARV from comparables is only as good as the comps and adjustments supplied. Every report carries this disclaimer.
 
@@ -67,6 +67,18 @@ Year *y*: EGI × (1 + rent growth)^(y−1); OpEx × (1 + expense growth)^(y−1)
 ### 2.12 Sensitivity and scenarios
 Two-way grids at −10%, −5%, base, +5%, +10%: MAO across ARV × repairs; cash-on-cash and DSCR across rent × interest rate. `compareFinancingScenarios` runs identical operating assumptions under multiple loan structures (all cash, conventional, DSCR loan, etc.).
 
+### 2.13 BRRRR (`analyzeBrrrr`)
+Total project cost = Purchase + Rehab + Acquisition closing + Holding + Acquisition financing. Cash in before refi = Total cost − Acquisition loan. Refinance loan = ARV × LTV. Cash out = Refinance loan − Refinance closing − Acquisition loan payoff. Cash left in deal = Cash in − Cash out (≤ 0 means all capital recovered; cash-on-cash is then unbounded and reported as null). Stabilized NOI, debt service, and DSCR come from `analyzeRental` on the refinance loan; yield on cost = NOI ÷ Total cost. Warnings: refinance short of payoff, LTV > 80%, ARV not from an appraisal, lender seasoning (6–12 months), value below cost.
+
+### 2.14 Creative finance (`analyzeSellerFinance`, `analyzeSubjectTo`, `analyzeWrap`, `analyzeLeaseOption`)
+Seller note: payment on the amortization schedule, balloon = remaining balance at the balloon month. Subject-to: seller equity = Price − Balance; equity at entry = Value − Balance − Arrears; cash required = Cash to seller + Arrears + Closing + Repairs; cash flow = Rent − (P&I + Escrow) − Opex. Wrap: spread = Wrap payment − Underlying payment − Servicing; equity in note = Wrap balance − Underlying balance at the horizon. Lease option: cash flow = Rent − Carrying cost; net price = Strike − Rent credits − Credited option fee; projected value extrapolates appreciation. **Every structure carries review flags**: due-on-sale (subject-to, wrap), Dodd-Frank/SAFE Act and state installment-sale rules (wrap), recharacterization as an equitable mortgage (lease option), balloon risk, and attorney/title review. Existing-loan inputs not marked `verified` raise a critical warning: recorded mortgage data does not establish the current balance, rate, payment, or arrears.
+
+### 2.15 Section 8 (`analyzeSection8`)
+Three figures stay separate: the HUD benchmark (FMR or SAFMR, labelled with fiscal year), the PHA payment standard (verified, or estimated as benchmark × assumed rate and flagged), and contract rent. Contract rent at standard = Payment standard − Utility allowance. Underwritten rent = min(Proposed, At standard, Comparable market rent). Results include voucher and market scenarios side by side. Every result states that the benchmark is not an approved rent and that no rent or tenancy is guaranteed, notes the PHA inspection, and states that the analysis evaluates properties only and must not be used for tenant screening or eligibility.
+
+### 2.16 Small multifamily (`analyzeRentRoll`, `analyzeSmallMultifamily`)
+In-place GPR = Σ occupied current rent × 12; Market GPR = Σ market rent × 12; Loss to lease = Σ (market − current) over occupied × 12; physical occupancy = occupied ÷ units; economic occupancy = In-place GPR ÷ Market GPR; lease rollover within 12 months of the rent roll date. In-place and pro-forma are underwritten separately (pro-forma labelled a target, not current performance). Unverified rents are flagged for reconciliation against leases and deposits.
+
 ## 3. Numerical policy
 
 - Full double precision internally; outputs rounded to cents with half-away-from-zero using exponent shifting (`1.005 → 1.01`).
@@ -79,4 +91,4 @@ Each saved analysis stores the form, the engine input, the full report, `engine_
 
 ## 5. Verification
 
-`packages/underwriting/test`: 103 tests at ≥99% line coverage, including textbook values (e.g. $200,000 at 6% for 30 years = $1,199.10/month), boundary and invalid inputs, reconciliation tests (cost stack reconciles to MAO; max supportable fee leaves margin exactly at minimum), determinism and fingerprint stability, and seeded property-based invariants (MAO linearity, amortization identities, IRR root property, NOI/cash-flow identities across 300 random deals).
+`packages/underwriting/test`: 133 tests at ≥99% line coverage, including textbook values (e.g. $200,000 at 6% for 30 years = $1,199.10/month), boundary and invalid inputs, reconciliation tests (cost stack reconciles to MAO; max supportable fee leaves margin exactly at minimum), determinism and fingerprint stability, and seeded property-based invariants (MAO linearity, amortization identities, IRR root property, NOI/cash-flow identities across 300 random deals).
