@@ -21,6 +21,15 @@ importers:
         specifier: 4.1.12
         version: 4.1.12(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.7(@types/node@22.20.5)(tsx@4.20.6))
 
+  packages/core:
+    dependencies:
+      '@northstar/underwriting':
+        specifier: workspace:*
+        version: link:../underwriting
+      zod:
+        specifier: 4.1.12
+        version: 4.1.12
+
   packages/db:
     dependencies:
       pg:
@@ -766,6 +775,9 @@ packages:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
 
+  zod@4.1.12:
+    resolution: {integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==}
+
 snapshots:
 
   '@babel/helper-string-parser@7.29.13': {}
@@ -1309,3 +1321,5 @@ snapshots:
       stackback: 0.0.2
 
   xtend@4.0.2: {}
+
+  zod@4.1.12: {}

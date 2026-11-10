@@ -1,0 +1,13 @@
+{
+  "name": "@northstar/integrations",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Provider-agnostic adapters for property data, messaging, and CRM, with safe mock implementations.",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "tsc -p tsconfig.json --noUnusedLocals --noUnusedParameters",
+    "test": "vitest run"
+  }
+}
