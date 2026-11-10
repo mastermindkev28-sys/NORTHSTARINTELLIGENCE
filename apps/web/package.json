@@ -1,0 +1,33 @@
+{
+  "name": "@northstar/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters",
+    "test": "echo 'web: covered by e2e (pnpm --filter @northstar/web e2e)'",
+    "e2e": "node e2e/smoke.mjs"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "5.2.7",
+    "@northstar/core": "workspace:*",
+    "@northstar/db": "workspace:*",
+    "@northstar/integrations": "workspace:*",
+    "@northstar/underwriting": "workspace:*",
+    "geist": "1.5.1",
+    "next": "16.4.3",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.17",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "tailwindcss": "4.1.17"
+  }
+}

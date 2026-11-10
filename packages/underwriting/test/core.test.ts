@@ -9,7 +9,7 @@ import {
   sourced,
   toSourced,
   valueOf,
-} from '../src/index.js';
+} from '../src/index';
 
 describe('roundTo / roundCurrency', () => {
   it('rounds half away from zero without binary representation error', () => {

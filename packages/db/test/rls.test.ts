@@ -6,8 +6,8 @@
 import { randomBytes, createHash, randomUUID } from 'node:crypto';
 import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, inject, it } from 'vitest';
-import { createDb, migrate, repo, withAnonymous, withTenant, withUser, type Db } from '../src/index.js';
-import { MIGRATIONS_DIR } from '../src/paths.js';
+import { createDb, migrate, repo, withAnonymous, withTenant, withUser, type Db } from '../src/index';
+import { MIGRATIONS_DIR } from '../src/paths';
 
 const available = inject('dbAvailable');
 const d = available ? describe : describe.skip;
@@ -88,7 +88,7 @@ d('database: tenancy, RBAC, audit (real Postgres, RLS enforced)', () => {
       expect(res.applied).toEqual([]);
       await owner.query(`update schema_migrations set checksum = 'tampered' where name = '0001_foundation.sql'`);
       await expect(migrate(inject('ownerUrl'), MIGRATIONS_DIR)).rejects.toThrow(/checksum mismatch/);
-      const files = await (await import('../src/migrate.js')).loadMigrations(MIGRATIONS_DIR);
+      const files = await (await import('../src/migrate')).loadMigrations(MIGRATIONS_DIR);
       await owner.query(`update schema_migrations set checksum = $1 where name = '0001_foundation.sql'`, [files[0]!.checksum]);
     });
   });

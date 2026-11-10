@@ -10,7 +10,7 @@ import {
   createPropertyProvider,
   isOptOutKeyword,
   type OutboundMessage,
-} from '../src/index.js';
+} from '../src/index';
 
 const q = { line1: '123 Maple St', city: 'Austin', state: 'TX', postalCode: '78701' };
 

@@ -22,7 +22,7 @@ import {
   verifyPassword,
   verifyWebhook,
   wholesaleFormSchema,
-} from '../src/index.js';
+} from '../src/index';
 import { buildRentalReport, buildWholesaleDealReport } from '@northstar/underwriting';
 
 describe('passwords', () => {

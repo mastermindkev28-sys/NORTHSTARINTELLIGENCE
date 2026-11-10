@@ -8,7 +8,7 @@ import {
   roundCurrency,
   type CalculationResult,
   type NumericInput,
-} from './core.js';
+} from './core';
 
 // ---------------------------------------------------------------------------------------------
 // Rule-of-thumb MAO

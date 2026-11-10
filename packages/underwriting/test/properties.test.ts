@@ -10,7 +10,7 @@ import {
   irr,
   npv,
   remainingBalance,
-} from '../src/index.js';
+} from '../src/index';
 
 function rng(seed: number) {
   let s = seed >>> 0;

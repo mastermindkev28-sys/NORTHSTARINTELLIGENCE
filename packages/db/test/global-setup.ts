@@ -8,8 +8,8 @@
  */
 import pg from 'pg';
 import type { TestProject } from 'vitest/node';
-import { migrate } from '../src/migrate.js';
-import { MIGRATIONS_DIR } from '../src/paths.js';
+import { migrate } from '../src/migrate';
+import { MIGRATIONS_DIR } from '../src/paths';
 
 const ADMIN_URL = process.env.TEST_DATABASE_ADMIN_URL ?? 'postgres://postgres@localhost:5432/postgres';
 const DB_NAME = `northstar_test_${process.pid}`;

@@ -3,9 +3,9 @@
  * pre-built grids for the two questions operators ask most: "what if ARV or repairs are off?"
  * and "what if rent or the interest rate moves?".
  */
-import { UnderwritingInputError, requireNumber } from './core.js';
-import { calculateMao, type MaoInput } from './wholesale.js';
-import { analyzeRental, type RentalInput } from './rental.js';
+import { UnderwritingInputError, requireNumber } from './core';
+import { calculateMao, type MaoInput } from './wholesale';
+import { analyzeRental, type RentalInput } from './rental';
 
 export interface OneWayRow<T> {
   delta: number;

@@ -5,7 +5,7 @@ import {
   calculateFinancingCosts,
   calculateHoldingCosts,
   estimateRenovation,
-} from '../src/index.js';
+} from '../src/index';
 
 describe('estimateRenovation', () => {
   it('extends line items and applies contingency', () => {

@@ -15,8 +15,8 @@ import {
   type NumericInput,
   type TraceStep,
   type UnderwritingWarning,
-} from './core.js';
-import { calculateArv, type ArvResult, type ComparableSale } from './arv.js';
+} from './core';
+import { calculateArv, type ArvResult, type ComparableSale } from './arv';
 import {
   calculateClosingCosts,
   calculateDispositionCosts,
@@ -24,11 +24,11 @@ import {
   calculateHoldingCosts,
   estimateRenovation,
   type RenovationLineItem,
-} from './costs.js';
-import { analyzeFlip, type FlipResult } from './flip.js';
-import { analyzeAssignment, calculateDetailedMao, calculateMao, type AssignmentResult } from './wholesale.js';
-import { maoSensitivity, rentalSensitivity, type TwoWayGrid } from './sensitivity.js';
-import { analyzeRental, projectRental, type ProjectionResult, type RentalInput, type RentalResult } from './rental.js';
+} from './costs';
+import { analyzeFlip, type FlipResult } from './flip';
+import { analyzeAssignment, calculateDetailedMao, calculateMao, type AssignmentResult } from './wholesale';
+import { maoSensitivity, rentalSensitivity, type TwoWayGrid } from './sensitivity';
+import { analyzeRental, projectRental, type ProjectionResult, type RentalInput, type RentalResult } from './rental';
 
 /** Stable JSON (sorted keys) so the fingerprint does not depend on property order. */
 export function stableStringify(value: unknown): string {

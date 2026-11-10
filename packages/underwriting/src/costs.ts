@@ -11,8 +11,8 @@ import {
   roundCurrency,
   type CalculationResult,
   type NumericInput,
-} from './core.js';
-import { amortizingPayment, interestOnlyPayment } from './finance.js';
+} from './core';
+import { amortizingPayment, interestOnlyPayment } from './finance';
 
 // ---------------------------------------------------------------------------------------------
 // Renovation

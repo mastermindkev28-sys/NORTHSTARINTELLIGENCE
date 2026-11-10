@@ -19,7 +19,7 @@ import {
   type CalculationResult,
   type NumericInput,
   type Sourced,
-} from './core.js';
+} from './core';
 
 export interface ComparableSale {
   id: string;

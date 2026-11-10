@@ -7,8 +7,8 @@ import {
   roundCurrency,
   type CalculationResult,
   type NumericInput,
-} from './core.js';
-import { annualizeReturn } from './finance.js';
+} from './core';
+import { annualizeReturn } from './finance';
 
 export interface FlipInput {
   purchasePrice: NumericInput;

@@ -7,7 +7,7 @@ import {
   sourced,
   stableStringify,
   type WholesaleDealInput,
-} from '../src/index.js';
+} from '../src/index';
 
 const deal: WholesaleDealInput = {
   subjectSquareFeet: sourced(1600, 'verified', { sourceRef: 'County assessor' }),

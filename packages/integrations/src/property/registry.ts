@@ -2,9 +2,9 @@
  * Provider selection. There is deliberately NO silent fallback from a real provider to demo data:
  * if a configured provider fails, the error surfaces. Demo data is used only when explicitly chosen.
  */
-import { MockPropertyProvider } from './mock.js';
-import { RentCastProvider } from './rentcast.js';
-import { ProviderError, type PropertyDataProvider, type UsageMeter } from './types.js';
+import { MockPropertyProvider } from './mock';
+import { RentCastProvider } from './rentcast';
+import { ProviderError, type PropertyDataProvider, type UsageMeter } from './types';
 
 export interface ProviderEnv {
   PROPERTY_DATA_PROVIDER?: string;

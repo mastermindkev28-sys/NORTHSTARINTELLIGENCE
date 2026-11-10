@@ -1,8 +1,8 @@
 /**
  * Financing scenario comparison: run the same rental under several loan structures side by side.
  */
-import { UnderwritingInputError, type CalculationResult } from './core.js';
-import { analyzeRental, type LoanTerms, type RentalInput, type RentalResult } from './rental.js';
+import { UnderwritingInputError, type CalculationResult } from './core';
+import { analyzeRental, type LoanTerms, type RentalInput, type RentalResult } from './rental';
 
 export interface FinancingScenario {
   id: string;

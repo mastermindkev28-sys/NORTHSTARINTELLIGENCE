@@ -18,8 +18,8 @@ import {
   roundCurrency,
   type CalculationResult,
   type NumericInput,
-} from './core.js';
-import { amortizingPayment, interestOnlyPayment, irr, remainingBalance } from './finance.js';
+} from './core';
+import { amortizingPayment, interestOnlyPayment, irr, remainingBalance } from './finance';
 
 export interface OperatingExpenses {
   annualPropertyTax: NumericInput;

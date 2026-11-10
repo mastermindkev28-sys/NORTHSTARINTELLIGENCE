@@ -9,7 +9,7 @@
  * Note: RentCast AVM "comparables" include listings, not only closed sales; they are surfaced as comps
  * with confidence capped accordingly and must be reviewed before use in ARV.
  */
-import { ProviderError, type AddressQuery, type CompRecord, type CompsQuery, type FieldProvenance, type OwnerRecord, type PropertyDataProvider, type PropertyRecord, type ProvidedField, type SaleEvent, type UsageMeter, type ValueEstimate } from './types.js';
+import { ProviderError, type AddressQuery, type CompRecord, type CompsQuery, type FieldProvenance, type OwnerRecord, type PropertyDataProvider, type PropertyRecord, type ProvidedField, type SaleEvent, type UsageMeter, type ValueEstimate } from './types';
 
 export interface RentCastConfig {
   apiKey: string;

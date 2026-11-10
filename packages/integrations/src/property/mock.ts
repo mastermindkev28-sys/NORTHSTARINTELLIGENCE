@@ -3,7 +3,7 @@
  * never be mistaken for real property information. Values are derived from a hash of the address,
  * so the same address always returns the same demo record (useful for tests and product demos).
  */
-import type { AddressQuery, CompRecord, CompsQuery, FieldProvenance, OwnerRecord, PropertyDataProvider, PropertyRecord, ProvidedField, SaleEvent, ValueEstimate } from './types.js';
+import type { AddressQuery, CompRecord, CompsQuery, FieldProvenance, OwnerRecord, PropertyDataProvider, PropertyRecord, ProvidedField, SaleEvent, ValueEstimate } from './types';
 
 function hash(s: string): number {
   let h = 2166136261;

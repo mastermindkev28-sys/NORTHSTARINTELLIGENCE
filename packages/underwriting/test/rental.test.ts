@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { analyzeRental, npv, projectRental, type RentalInput } from '../src/index.js';
+import { analyzeRental, npv, projectRental, type RentalInput } from '../src/index';
 
 const input: RentalInput = {
   purchasePrice: 200_000,

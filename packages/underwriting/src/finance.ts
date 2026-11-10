@@ -2,7 +2,7 @@
  * Time-value-of-money and loan math. Pure numeric functions (no provenance) used by the higher-level
  * calculators. All rates are annual decimals (0.065 = 6.5%); periods are months unless noted.
  */
-import { UnderwritingInputError, requireNumber } from './core.js';
+import { UnderwritingInputError, requireNumber } from './core';
 
 /**
  * Fully amortizing monthly payment (principal + interest).

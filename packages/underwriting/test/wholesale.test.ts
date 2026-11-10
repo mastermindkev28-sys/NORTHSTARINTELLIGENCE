@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { analyzeAssignment, analyzeFlip, calculateDetailedMao, calculateMao, sourced } from '../src/index.js';
+import { analyzeAssignment, analyzeFlip, calculateDetailedMao, calculateMao, sourced } from '../src/index';
 
 describe('calculateMao (rule of thumb)', () => {
   it('applies ARV × 70% − repairs − fee by default', () => {

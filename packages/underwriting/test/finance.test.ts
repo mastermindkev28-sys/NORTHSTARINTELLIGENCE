@@ -8,7 +8,7 @@ import {
   npv,
   remainingBalance,
   roundCurrency,
-} from '../src/index.js';
+} from '../src/index';
 
 describe('amortizingPayment', () => {
   it('matches standard mortgage tables', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateArv, sourced, type ComparableSale } from '../src/index.js';
+import { calculateArv, sourced, type ComparableSale } from '../src/index';
 
 const comps: ComparableSale[] = [
   { id: 'A', salePrice: 300_000, squareFeet: 1500, adjustments: { bathroom: 5000 }, saleDate: '2026-09-01', distanceMiles: 0.4 },

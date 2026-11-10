@@ -7,7 +7,7 @@ import {
   rentalSensitivity,
   analyzeRental,
   type RentalInput,
-} from '../src/index.js';
+} from '../src/index';
 
 const rental: RentalInput = {
   purchasePrice: 200_000,

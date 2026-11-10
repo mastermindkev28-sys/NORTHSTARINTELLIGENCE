@@ -4,8 +4,8 @@
  * (local development and CI only; production roles are provisioned by infrastructure).
  */
 import pg from 'pg';
-import { migrate } from '../src/migrate.js';
-import { MIGRATIONS_DIR } from '../src/paths.js';
+import { migrate } from '../src/migrate';
+import { MIGRATIONS_DIR } from '../src/paths';
 
 const url = process.env.DATABASE_OWNER_URL;
 if (!url) {

@@ -3,7 +3,7 @@
  * (withAnonymous / withUser / withTenant); none of them adds its own org filter for security,
  * because RLS is the enforcement layer. Explicit org filters appear only where they help the planner.
  */
-import type { Tx } from './client.js';
+import type { Tx } from './client';
 
 export type OrgRole = 'owner' | 'admin' | 'manager' | 'acquisitions' | 'analyst' | 'viewer';
 
