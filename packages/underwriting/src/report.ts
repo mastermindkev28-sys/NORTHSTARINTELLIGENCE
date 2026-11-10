@@ -203,7 +203,7 @@ export function buildWholesaleDealReport(input: WholesaleDealInput): WholesaleDe
   b.derived('basePrice', 'purchasePrice', 'salePrice', 'buyerAcquisitionCosts', 'holdingCosts', 'financingCosts', 'dispositionCosts', 'financedRehab', 'acquisitionCosts', 'buyerOtherCosts', 'buyerPrice', 'contractPrice', 'buyerMinMarginRate');
   const buyerPriceEstimate = Math.max(0, ruleMao.buyerMaxPrice);
   const acq = b.absorb(
-    calculateClosingCosts({ basePrice: buyerPriceEstimate, percentageCosts: { buyerClosing: by.acquisitionClosingRate } }, 'Buyer acquisition'),
+    calculateClosingCosts({ basePrice: buyerPriceEstimate, percentageCosts: { 'closing costs': by.acquisitionClosingRate } }, 'Buyer acquisition'),
     'Cost stack',
   ).total;
   const holdArgs: Parameters<typeof calculateHoldingCosts>[0] = {

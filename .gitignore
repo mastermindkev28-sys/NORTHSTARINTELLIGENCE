@@ -6,3 +6,5 @@ coverage
 .env
 .env.local
 .DS_Store
+e2e-artifacts
+next-env.d.ts

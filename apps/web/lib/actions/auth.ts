@@ -28,7 +28,7 @@ export interface FormState {
   values?: Record<string, string>;
 }
 
-// Per-instance limiter; replace with a shared store when running multiple instances (ADR-0007).
+// Per-instance limiter; replace with a shared store when running multiple instances (docs/ARCHITECTURE_DECISIONS.md, ADR-007).
 const loginLimiter = createMemoryRateLimiter({ capacity: 10, refillPerSecond: 10 / 300 });
 
 async function issueSession(userId: string) {

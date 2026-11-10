@@ -4,7 +4,7 @@
 -- Tenancy model: shared database, shared schema, every tenant-owned row carries org_id, and
 -- PostgreSQL row-level security (FORCED, so table owners are subject to it too) restricts every
 -- query to the organization in the request's tenant context AND requires the requesting user to be
--- an active member of it. See docs/DATABASE_SCHEMA.md and docs/adr/0003-multi-tenancy-rls.md.
+-- an active member of it. See docs/DATABASE_SCHEMA.md and docs/ARCHITECTURE_DECISIONS.md (ADR-003).
 --
 -- Tenant context is carried in transaction-local settings set by the API layer:
 --   app.user_id  -> authenticated user
