@@ -30,11 +30,11 @@ d('market intelligence schema (real Postgres, RLS enforced)', () => {
     owner = new pg.Client({ connectionString: inject('ownerUrl') });
     await owner.connect();
     const exists = await owner.query(`select 1 from pg_roles where rolname = 'northstar_test_ingest'`);
-    if (exists.rowCount === 0) await owner.query(`create role northstar_test_ingest login nobypassrls password 'ingest-test-only'`);
+    if (exists.rowCount === 0) await owner.query(`create role northstar_test_ingest login nobypassrls password 'test-only-password'`);
     await owner.query('grant northstar_ingest to northstar_test_ingest');
     const u = new URL(inject('appUrl'));
     u.username = 'northstar_test_ingest';
-    u.password = 'ingest-test-only';
+    u.password = 'test-only-password';
     ingestDb = createDb(u.toString());
     a = await signUp('mkt-a');
     b = await signUp('mkt-b');
