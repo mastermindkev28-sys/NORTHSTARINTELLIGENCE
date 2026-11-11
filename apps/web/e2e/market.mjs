@@ -113,11 +113,19 @@ try {
   await page.selectOption('select[name=strategy]', 'buy_and_hold');
   await page.click('text=Create watchlist');
   await page.waitForURL(/watchlists\?w=/);
-  for (const k of ['metro:demo-m31', 'metro:demo-m12', 'city:4260000']) {
+  const watchedRows = page.locator('tbody tr').filter({ has: page.locator('td a[href*="/app/market/area/"]') });
+  const areaKeys = ['metro:demo-m31', 'metro:demo-m12', 'city:4260000'];
+  for (const [i, k] of areaKeys.entries()) {
     await page.selectOption('select[name=areaKey]', k);
     await page.click('text=Add area');
-    await page.waitForLoadState('networkidle');
+    // Wait for the server action to land and re-render before adding the next area; networkidle alone
+    // can resolve before the action's navigation starts, which silently drops an area on slow runners.
+    await page.waitForFunction(
+      (n) => [...document.querySelectorAll('tbody tr')].filter((r) => r.querySelector('td a[href*="/app/market/area/"]')).length >= n,
+      i + 1,
+    );
   }
+  assert.equal(await watchedRows.count(), areaKeys.length, 'all three areas were added to the watchlist');
   await page.click('text=Run monitoring now');
   await page.waitForLoadState('networkidle');
   await page.getByText('Acknowledge').first().waitFor();

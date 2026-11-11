@@ -1,26 +1,45 @@
 @import 'tailwindcss';
 
-/* Northstar design tokens. Palette from docs/BRAND_GUIDELINES.md (brief section 04). */
+/*
+ * Northstar design system v2. Palette from docs/BRAND_GUIDELINES.md (brief section 04):
+ * Obsidian #10151E, Graphite #1B2533, Titanium #DCE4EE, Arctic #F7F9FC, Signal Blue #5689FF.
+ * Surfaces are layered from Obsidian toward Graphite; Signal Blue is reserved for focus, primary
+ * actions and the single most important number on a screen.
+ */
 @theme {
+  --color-void: #0a0e15;
   --color-obsidian: #10151e;
+  --color-obsidian-2: #131a25;
   --color-graphite: #1b2533;
   --color-graphite-2: #233042;
-  --color-line: #2b3a4f;
+  --color-graphite-3: #2a384c;
+  --color-line: #253246;
+  --color-line-strong: #33445c;
   --color-titanium: #dce4ee;
-  --color-muted: #8d9bb0;
+  --color-muted: #8392a8;
+  --color-faint: #5b6a80;
   --color-arctic: #f7f9fc;
   --color-signal: #5689ff;
+  --color-signal-bright: #7aa3ff;
   --color-signal-deep: #3f6fe6;
   --color-positive: #3ec59a;
   --color-caution: #e9b44c;
   --color-critical: #ef6b6b;
+  --color-violet: #9b8cff;
 
   --font-sans: var(--font-geist-sans), 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
+  --radius-md: 7px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --shadow-panel: 0 1px 0 0 rgb(255 255 255 / 0.035) inset, 0 0 0 1px rgb(0 0 0 / 0.25), 0 12px 32px -16px rgb(0 0 0 / 0.6);
+  --shadow-glow: 0 0 0 1px rgb(86 137 255 / 0.45), 0 6px 24px -6px rgb(86 137 255 / 0.55);
+
+  --animate-pulse-dot: pulse-dot 2.4s ease-in-out infinite;
+  --animate-rise: rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
 @layer base {
@@ -29,18 +48,48 @@
   }
   html,
   body {
-    background: var(--color-obsidian);
+    background: var(--color-void);
     color: var(--color-titanium);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-feature-settings: 'ss01', 'cv11';
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    /* Ambient canvas: a faint survey grid and a Signal Blue aurora at the top edge. */
+    background:
+      radial-gradient(1200px 520px at 62% -220px, rgb(86 137 255 / 0.13), transparent 70%),
+      radial-gradient(700px 380px at 6% -120px, rgb(155 140 255 / 0.06), transparent 70%),
+      linear-gradient(var(--color-obsidian), var(--color-void) 900px);
+    background-attachment: fixed;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(to right, rgb(220 228 238 / 0.028) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(220 228 238 / 0.028) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 90% 60% at 60% 0%, black 30%, transparent 85%);
+  }
+  body > * {
+    position: relative;
+    z-index: 1;
   }
   ::selection {
-    background: color-mix(in oklab, var(--color-signal) 35%, transparent);
+    background: color-mix(in oklab, var(--color-signal) 38%, transparent);
   }
   :focus-visible {
     outline: 2px solid var(--color-signal);
     outline-offset: 2px;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
   }
   input[type='number']::-webkit-inner-spin-button,
   input[type='number']::-webkit-outer-spin-button {
@@ -50,35 +99,152 @@
   input[type='number'] {
     -moz-appearance: textfield;
   }
+  input[type='date']::-webkit-calendar-picker-indicator {
+    filter: invert(0.7);
+  }
+  select option,
+  select optgroup {
+    background: var(--color-graphite);
+    color: var(--color-titanium);
+  }
 }
 
 @layer components {
   .num {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
   .eyebrow {
     font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-muted);
   }
+  /* Layered glass panel with a hairline gradient border (brighter at the top edge). */
   .panel {
-    background: var(--color-graphite);
+    position: relative;
+    background:
+      linear-gradient(180deg, rgb(35 48 66 / 0.55), rgb(27 37 51 / 0.42) 120px, rgb(22 30 42 / 0.5)),
+      var(--color-obsidian-2);
     border: 1px solid var(--color-line);
     border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-panel);
   }
+  .panel::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(180deg, rgb(220 228 238 / 0.14), rgb(220 228 238 / 0.02) 40%, transparent);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .panel-accent::after {
+    content: '';
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    top: -1px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-signal), transparent);
+    opacity: 0.8;
+  }
+  .glow-signal {
+    box-shadow: var(--shadow-panel), 0 0 0 1px rgb(86 137 255 / 0.25), 0 20px 60px -30px rgb(86 137 255 / 0.55);
+  }
+  .surface-inset {
+    background: rgb(10 14 21 / 0.55);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+  }
+
+  /* Data tables: mono uppercase headers, hairline rows, hover wash. Opt in with .data-table. */
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .data-table thead th {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+    padding: 0 12px 10px;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .data-table tbody td {
+    padding: 11px 12px;
+    border-bottom: 1px solid rgb(37 50 70 / 0.6);
+    vertical-align: middle;
+  }
+  .data-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .data-table tbody tr {
+    transition: background-color 120ms ease;
+  }
+  .data-table tbody tr:hover {
+    background: rgb(86 137 255 / 0.045);
+  }
+  .data-table th:first-child,
+  .data-table td:first-child {
+    padding-left: 20px;
+  }
+  .data-table th:last-child,
+  .data-table td:last-child {
+    padding-right: 20px;
+  }
+  .data-table.compact tbody td {
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+
   .fade-in {
-    animation: fade-in 180ms ease-out both;
+    animation: rise 380ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .stagger > * {
+    animation: rise 460ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .stagger > *:nth-child(2) { animation-delay: 40ms; }
+  .stagger > *:nth-child(3) { animation-delay: 80ms; }
+  .stagger > *:nth-child(4) { animation-delay: 120ms; }
+  .stagger > *:nth-child(5) { animation-delay: 160ms; }
+  .stagger > *:nth-child(6) { animation-delay: 200ms; }
+
+  .text-gradient {
+    background: linear-gradient(180deg, var(--color-arctic) 20%, #aebbd0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .kbd {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1;
+    padding: 3px 5px;
+    border-radius: 4px;
+    border: 1px solid var(--color-line-strong);
+    border-bottom-width: 2px;
+    color: var(--color-muted);
+    background: rgb(10 14 21 / 0.6);
+  }
+  .scanline {
+    background-image: repeating-linear-gradient(90deg, rgb(220 228 238 / 0.05) 0 1px, transparent 1px 8px);
   }
 }
 
-@keyframes fade-in {
+@keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(2px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -86,8 +252,31 @@
   }
 }
 
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 currentColor;
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 4px transparent;
+    opacity: 0.65;
+  }
+}
+
+@keyframes sweep {
+  from {
+    stroke-dashoffset: var(--sweep-from, 300);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .fade-in {
+  .fade-in,
+  .stagger > * {
     animation: none;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

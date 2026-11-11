@@ -77,9 +77,9 @@ export function RentalCalculator({ canSave }: { canSave: boolean }) {
   };
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
       <div className="flex flex-col gap-6">
-        <Panel title="Property and income" eyebrow="Revenue">
+        <Panel code="01" title="Property and income" eyebrow="Revenue">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Analysis name" htmlFor="rname"><Input id="rname" value={s.name} onChange={(e) => set('name', e.target.value)} placeholder="e.g. 18 Oak Duplex" maxLength={200} /></Field>
             <NumberField id="price" label="Purchase price" prefix="$" value={s.price} onChange={(v) => set('price', v)} error={err('purchasePrice.value')} right={<SourceSelect label="Price" value={s.priceSource} onChange={(v) => set('priceSource', v)} />} />
@@ -102,7 +102,7 @@ export function RentalCalculator({ canSave }: { canSave: boolean }) {
           </div>
         </Panel>
 
-        <Panel title="Operating expenses" eyebrow="Expenses">
+        <Panel code="02" title="Operating expenses" eyebrow="Expenses">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <NumberField id="vac" label="Vacancy & credit loss" suffix="%" value={s.vacancyPct} onChange={(v) => set('vacancyPct', v)} />
             <NumberField id="rtax" label="Annual property tax" prefix="$" value={s.annualPropertyTax} onChange={(v) => set('annualPropertyTax', v)} error={err('annualPropertyTax')} />
@@ -115,12 +115,13 @@ export function RentalCalculator({ canSave }: { canSave: boolean }) {
         </Panel>
 
         <Panel
+          code="03"
           title="Acquisition and financing"
           eyebrow="Capital"
           actions={
-            <div className="flex rounded-md border border-line p-0.5 text-[12px]" role="tablist" aria-label="Financing">
+            <div className="flex rounded-lg border border-line bg-void/60 p-0.5 text-[12px]" role="tablist" aria-label="Financing">
               {(['loan', 'cash'] as const).map((m) => (
-                <button key={m} role="tab" aria-selected={s.financing === m} onClick={() => set('financing', m)} className={cx('rounded px-2.5 py-1', s.financing === m ? 'bg-graphite-2 text-titanium' : 'text-muted')}>{m === 'loan' ? 'Financed' : 'All cash'}</button>
+                <button key={m} role="tab" aria-selected={s.financing === m} onClick={() => set('financing', m)} className={cx('rounded-md px-2.5 py-1 transition-colors', s.financing === m ? 'bg-graphite-3 text-titanium shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]' : 'text-muted hover:text-titanium')}>{m === 'loan' ? 'Financed' : 'All cash'}</button>
               ))}
             </div>
           }
@@ -140,7 +141,7 @@ export function RentalCalculator({ canSave }: { canSave: boolean }) {
           </div>
         </Panel>
 
-        <Panel title="Projection assumptions" eyebrow="Hold period">
+        <Panel code="04" title="Projection assumptions" eyebrow="Hold period">
           <div className="grid gap-4 sm:grid-cols-4">
             <NumberField id="yrs" label="Years" value={s.projectionYears} onChange={(v) => set('projectionYears', v)} />
             <NumberField id="rg" label="Rent growth" suffix="%/yr" value={s.rentGrowthPct} onChange={(v) => set('rentGrowthPct', v)} />
@@ -151,10 +152,10 @@ export function RentalCalculator({ canSave }: { canSave: boolean }) {
       </div>
 
       <div className="xl:sticky xl:top-20 xl:self-start">
-        <Panel title="Live result" eyebrow="Deterministic engine" actions={a ? <Badge tone={a.annualCashFlow >= 0 ? 'positive' : 'critical'}>{a.annualCashFlow >= 0 ? 'Cash flow positive' : 'Negative cash flow'}</Badge> : <Badge>Awaiting inputs</Badge>}>
+        <Panel accent className="glow-signal" title="Live result" eyebrow="Deterministic engine" actions={a ? <Badge tone={a.annualCashFlow >= 0 ? 'positive' : 'critical'}>{a.annualCashFlow >= 0 ? 'Cash flow positive' : 'Negative cash flow'}</Badge> : <Badge>Awaiting inputs</Badge>}>
           {r && a ? (
             <div className="flex flex-col gap-5">
-              <Stat label="Monthly cash flow" value={money(a.monthlyCashFlow)} tone={a.monthlyCashFlow >= 0 ? 'signal' : 'critical'} sub={`${money(a.annualCashFlow)} per year, pre-tax`} />
+              <div className="rounded-xl border border-signal/25 bg-[radial-gradient(120%_120%_at_0%_0%,rgb(86_137_255/0.18),transparent_60%)] p-4"><Stat size="xl" label="Monthly cash flow" value={money(a.monthlyCashFlow)} tone={a.monthlyCashFlow >= 0 ? 'signal' : 'critical'} sub={`${money(a.annualCashFlow)} per year, pre-tax`} /></div>
               <div className="grid grid-cols-2 gap-4 border-t border-line pt-4">
                 <Stat label="NOI" value={money(a.netOperatingIncome)} />
                 <Stat label="Cap rate" value={pct(a.capRate, 2)} />
@@ -169,7 +170,7 @@ export function RentalCalculator({ canSave }: { canSave: boolean }) {
               {r.sensitivity && (
                 <div className="border-t border-line pt-4">
                   <div className="eyebrow mb-2">Cash-on-cash · rent × rate</div>
-                  <SensitivityGrid grid={r.sensitivity} rowLabel="Rent" colLabel="Rate" format={(v) => pct(v.cashOnCash)} tone={(v) => ((v.cashOnCash ?? 0) < 0 ? 'bad' : 'good')} />
+                  <SensitivityGrid grid={r.sensitivity} rowLabel="Rent" colLabel="Rate" format={(v) => pct(v.cashOnCash)} tone={(v) => ((v.cashOnCash ?? 0) < 0 ? 'bad' : 'good')} value={(v) => v.cashOnCash} />
                 </div>
               )}
             </div>
