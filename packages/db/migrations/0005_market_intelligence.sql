@@ -187,7 +187,7 @@ begin
   return new;
 end $$;
 
-create or replace function app.guard_same_org_profile() returns trigger
+create or replace function app.guard_same_org_score_profile() returns trigger
 language plpgsql security definer set search_path = pg_catalog, public
 as $$
 begin
@@ -199,7 +199,7 @@ begin
   return new;
 end $$;
 create trigger market_watchlists_same_org_profile before insert or update of profile_id, org_id on public.market_watchlists
-  for each row execute function app.guard_same_org_profile();
+  for each row execute function app.guard_same_org_score_profile();
 
 create table public.market_watchlist_items (
   id               uuid primary key default gen_random_uuid(),
