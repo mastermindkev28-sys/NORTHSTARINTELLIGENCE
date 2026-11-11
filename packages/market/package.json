@@ -1,0 +1,16 @@
+{
+  "name": "@northstar/market",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Northstar Market Intelligence: geographic data model, transparent Market Score, Landlord Regulatory Index, undervaluation evidence, monitoring rules.",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "tsc -p tsconfig.json --noUnusedLocals --noUnusedParameters",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": { "@northstar/underwriting": "workspace:*" },
+  "devDependencies": { "@vitest/coverage-v8": "4.1.12" }
+}

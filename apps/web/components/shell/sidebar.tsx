@@ -11,7 +11,7 @@ const nav = [
     section: 'Divisions',
     items: [
       { href: null, label: 'Acquire', code: '01' },
-      { href: null, label: 'Intelligence', code: '02' },
+      { href: '/app/market', label: 'Market Intelligence', code: '02' },
       { href: '/app/underwrite', label: 'Underwrite', code: '03' },
       { href: null, label: 'Due Diligence', code: '04' },
       { href: null, label: 'Transact', code: '05' },

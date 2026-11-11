@@ -40,6 +40,8 @@ jobs:
         run: pnpm test
       - name: Underwriting coverage gate
         run: pnpm --filter @northstar/underwriting test:coverage
+      - name: Market engine coverage gate
+        run: pnpm --filter @northstar/market test:coverage
       - name: Build web
         run: pnpm --filter @northstar/web build
       - name: Prepare e2e database
@@ -54,6 +56,7 @@ jobs:
           DATABASE_URL=postgres://northstar_web:e2e-password@localhost:5432/northstar_e2e PORT=3000 pnpm start &
           for i in $(seq 1 30); do curl -sf localhost:3000/api/health && break; sleep 1; done
           BASE_URL=http://localhost:3000 SCREENSHOT_DIR=e2e-artifacts pnpm e2e
+          BASE_URL=http://localhost:3000 SCREENSHOT_DIR=e2e-artifacts node e2e/market.mjs
       - name: Upload e2e screenshots
         if: always()
         uses: actions/upload-artifact@v4

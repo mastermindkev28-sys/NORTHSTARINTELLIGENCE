@@ -74,7 +74,11 @@ All tables: `org_id NOT NULL`, FORCE RLS, standard policy set from `app.apply_te
 
 **Tenant tables (standard policies)**: `investor_profiles` (experience, capital, financing list, risk tolerance, hold years, strategies), `buy_boxes` (strategies `app.investment_strategy[]`, criteria jsonb, optional same-org profile), `saved_searches` (filters, alert cadence), `watchlist_items` (unique per org + parcel).
 
-## Invariants proven by tests (`packages/db/test/rls.test.ts`, `discover.test.ts`)
+### Market Intelligence (0005)
+
+Global reference tables `geo_areas`, `geo_metric_observations`, `regulatory_factors` are readable by any authenticated user and writable only by `northstar_ingest`; `regulatory_factors` is append-only and observation metric names matching protected characteristics are rejected by a check constraint. Tenant tables `market_score_profiles`, `market_watchlists`, `market_watchlist_items`, `market_alert_rules`, `market_alerts` use the standard policy set with same-org guards; alerts are unique per (org_id, dedupe_key). See `docs/MARKET_INTELLIGENCE_ENGINE.md`. Tests: `packages/db/test/market.test.ts`.
+
+## Invariants proven by tests (`packages/db/test/rls.test.ts`, `discover.test.ts`, `market.test.ts`)
 
 - App role is not superuser, not owner, `NOBYPASSRLS`; every public table has RLS enabled and forced.
 - No context → zero rows from every table and no inserts.
