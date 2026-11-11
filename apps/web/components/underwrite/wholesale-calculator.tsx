@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from 'react';
 import { buildWholesaleDealReport, UnderwritingInputError, type InputSource, type WholesaleDealReport } from '@northstar/underwriting';
 import { fieldErrors, toWholesaleDealInput, wholesaleFormSchema } from '@northstar/core/validation';
 import { saveAnalysisAction } from '@/lib/actions/underwriting';
-import { Badge, Button, Field, Input, Panel, Stat, cx } from '@/components/ui';
+import { Badge, Button, Field, Input, Meter, Panel, Segmented, Stat, StatusDot, cx } from '@/components/ui';
 import { money, moneyCompact, pct } from '@/lib/format';
 import { NumberField } from './number-field';
 import { SourceSelect } from './source-select';
@@ -114,9 +114,9 @@ export function WholesaleCalculator({ canSave }: { canSave: boolean }) {
   };
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
       <div className="flex flex-col gap-6">
-        <Panel title="Deal" eyebrow="Identification">
+        <Panel code="01" title="Deal" eyebrow="Identification">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Analysis name" htmlFor="name" error={err('name')}>
               <Input id="name" value={s.name} placeholder="e.g. 412 Maple Ave" onChange={(e) => set('name', e.target.value)} maxLength={200} />
@@ -128,17 +128,10 @@ export function WholesaleCalculator({ canSave }: { canSave: boolean }) {
         </Panel>
 
         <Panel
+          code="02"
           title="After-repair value"
           eyebrow="Valuation"
-          actions={
-            <div className="flex rounded-md border border-line p-0.5 text-[12px]" role="tablist" aria-label="ARV method">
-              {(['direct', 'comps'] as const).map((m) => (
-                <button key={m} role="tab" aria-selected={s.arvMode === m} onClick={() => set('arvMode', m)} className={cx('rounded px-2.5 py-1', s.arvMode === m ? 'bg-graphite-2 text-titanium' : 'text-muted')}>
-                  {m === 'direct' ? 'Enter ARV' : 'From comps'}
-                </button>
-              ))}
-            </div>
-          }
+          actions={<Segmented label="ARV method" value={s.arvMode} onChange={(v) => set('arvMode', v)} options={[{ value: 'direct', label: 'Enter ARV' }, { value: 'comps', label: 'From comps' }]} />}
         >
           {s.arvMode === 'direct' ? (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -154,10 +147,10 @@ export function WholesaleCalculator({ canSave }: { canSave: boolean }) {
                 <Field label="Valuation date" htmlFor="vdate"><Input id="vdate" type="date" value={s.valuationDate} onChange={(e) => set('valuationDate', e.target.value)} /></Field>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[760px] text-[12.5px]">
+                <table className="data-table compact min-w-[760px] text-[12.5px]">
                   <thead>
-                    <tr className="text-left text-muted">
-                      {['ID', 'Address', 'Sale price', 'Sqft', 'Sale date', 'Miles', 'Net adj.', 'Source', ''].map((h) => <th key={h} className="pb-2 pr-2 font-normal">{h}</th>)}
+                    <tr className="text-left">
+                      {['ID', 'Address', 'Sale price', 'Sqft', 'Sale date', 'Miles', 'Net adj.', 'Source', ''].map((h) => <th key={h}>{h}</th>)}
                     </tr>
                   </thead>
                   <tbody>
@@ -186,7 +179,7 @@ export function WholesaleCalculator({ canSave }: { canSave: boolean }) {
           )}
         </Panel>
 
-        <Panel title="Repairs and deal terms" eyebrow="Acquisition">
+        <Panel code="03" title="Repairs and deal terms" eyebrow="Acquisition">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <NumberField id="repairs" label="Estimated repairs" prefix="$" value={s.repairs} onChange={(v) => set('repairs', v)} error={err('repairs.value') ?? err('repairs')} right={<SourceSelect label="Repairs" value={s.repairsSource} onChange={(v) => set('repairsSource', v)} />} />
             <NumberField id="fee" label="Target assignment fee" prefix="$" value={s.assignmentFee} onChange={(v) => set('assignmentFee', v)} error={err('assignmentFee')} />
@@ -196,7 +189,7 @@ export function WholesaleCalculator({ canSave }: { canSave: boolean }) {
           </div>
         </Panel>
 
-        <Panel title="End-buyer assumptions" eyebrow="Cost stack">
+        <Panel code="04" title="End-buyer assumptions" eyebrow="Cost stack">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <NumberField id="acq" label="Buyer closing costs" suffix="%" value={s.buyer.acquisitionClosingPct} onChange={(v) => setB('acquisitionClosingPct', v)} />
             <NumberField id="months" label="Holding period" suffix="mo" value={s.buyer.holdingMonths} onChange={(v) => setB('holdingMonths', v)} />
@@ -217,36 +210,56 @@ export function WholesaleCalculator({ canSave }: { canSave: boolean }) {
       </div>
 
       <div className="xl:sticky xl:top-20 xl:self-start">
-        <Panel title="Live result" eyebrow="Deterministic engine" actions={r ? <Badge tone={r.summary.viableForBuyer ? 'positive' : 'critical'}>{r.summary.viableForBuyer ? 'Buyer viable' : 'Not viable'}</Badge> : <Badge>Awaiting inputs</Badge>}>
+        <section className={cx('panel fade-in overflow-hidden', r && 'panel-accent glow-signal')}>
+          <header className="flex items-center justify-between gap-3 border-b border-line/80 px-5 py-3.5">
+            <div>
+              <div className="eyebrow mb-1 flex items-center gap-2"><StatusDot tone={r ? 'positive' : 'neutral'} live={!!r} />Deterministic engine</div>
+              <h2 className="text-[14px] font-semibold text-titanium">Live result</h2>
+            </div>
+            {r ? <Badge dot tone={r.summary.viableForBuyer ? 'positive' : 'critical'}>{r.summary.viableForBuyer ? 'Buyer viable' : 'Not viable'}</Badge> : <Badge>Awaiting inputs</Badge>}
+          </header>
+          <div className="p-5">
           {r ? (
             <div className="flex flex-col gap-5">
-              <Stat label="Recommended max offer" value={money(r.summary.recommendedMaxOffer)} tone={r.summary.recommendedMaxOffer > 0 ? 'signal' : 'critical'} sub="Lower of rule-of-thumb and cost-stack MAO" />
-              <div className="grid grid-cols-2 gap-4 border-t border-line pt-4">
-                <Stat label="Rule of thumb" value={money(r.summary.maoRuleOfThumb)} />
-                <Stat label="Cost stack" value={money(r.summary.maoCostStack)} />
+              <div className="rounded-xl border border-signal/25 bg-[radial-gradient(120%_120%_at_0%_0%,rgb(86_137_255/0.18),transparent_60%)] p-4">
+                <Stat size="xl" label="Recommended max offer" value={money(r.summary.recommendedMaxOffer)} tone={r.summary.recommendedMaxOffer > 0 ? 'signal' : 'critical'} sub="Lower of rule-of-thumb and cost-stack MAO" />
+                <div className="mt-4 grid grid-cols-2 gap-2 text-[11.5px]">
+                  <div className={cx('surface-inset px-3 py-2', r.summary.maoRuleOfThumb <= r.summary.maoCostStack && 'border-signal/40')}><div className="eyebrow text-[9px]">Rule of thumb</div><div className="num mt-1 text-[14px] text-titanium">{money(r.summary.maoRuleOfThumb)}</div></div>
+                  <div className={cx('surface-inset px-3 py-2', r.summary.maoCostStack < r.summary.maoRuleOfThumb && 'border-signal/40')}><div className="eyebrow text-[9px]">Cost stack</div><div className="num mt-1 text-[14px] text-titanium">{money(r.summary.maoCostStack)}</div></div>
+                </div>
+              </div>
+              <div>
+                <div className="mb-1.5 flex items-center justify-between text-[11.5px]">
+                  <span className="eyebrow">Buyer margin</span>
+                  <span className={cx('num', r.summary.viableForBuyer ? 'text-positive' : 'text-critical')}>{pct(r.summary.buyerMargin)} <span className="text-faint">· {money(r.summary.buyerProjectedProfit)}</span></span>
+                </div>
+                <Meter value={Math.max(0, r.summary.buyerMargin * 100)} max={30} tone={r.summary.viableForBuyer ? 'positive' : 'critical'} />
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-4 border-t border-line pt-4">
                 <Stat label="ARV" value={money(r.summary.arv)} />
                 <Stat label="Repairs" value={money(r.summary.repairCosts)} />
                 <Stat label="Buyer price" value={money(r.summary.buyerPrice)} sub={`at contract ${money(r.summary.contractPrice)}`} />
-                <Stat label="Buyer margin" value={pct(r.summary.buyerMargin)} tone={r.summary.viableForBuyer ? 'positive' : 'critical'} sub={money(r.summary.buyerProjectedProfit)} />
-                <Stat label="Your net" value={money(r.assignment.wholesalerNet)} sub={`fee ${money(r.summary.assignmentFee)}`} />
+                <Stat label="Your net" value={money(r.assignment.wholesalerNet)} tone="positive" sub={`fee ${money(r.summary.assignmentFee)}`} />
                 <Stat label="Max supportable fee" value={money(r.assignment.maxSupportableFee)} />
+                <Stat label="Buyer all-in" value={money(r.assignment.buyerAllIn)} />
               </div>
               <WarningList warnings={r.warnings} limit={5} />
               <div className="border-t border-line pt-4">
                 <div className="eyebrow mb-2">MAO sensitivity · ARV × repairs</div>
-                <SensitivityGrid grid={r.sensitivity} rowLabel="ARV" colLabel="Repairs" format={(v) => moneyCompact(v)} />
+                <SensitivityGrid grid={r.sensitivity} rowLabel="ARV" colLabel="Repairs" format={(v) => moneyCompact(v)} tone={(v) => (v <= 0 ? 'bad' : 'good')} value={(v) => v} />
               </div>
             </div>
           ) : (
-            <p className="text-[13px] text-muted">Enter an ARV (or comps), repairs, property tax, and insurance to see the analysis. Every figure is computed by tested, deterministic functions; nothing is estimated by AI.</p>
+            <p className="text-[13px] leading-relaxed text-muted">Enter an ARV (or comps), repairs, property tax, and insurance to see the analysis. Every figure is computed by tested, deterministic functions; nothing is estimated by AI.</p>
           )}
           <div className="mt-5 flex flex-col gap-2 border-t border-line pt-4">
             {serverError && <p role="alert" className="text-[12.5px] text-critical">{serverError}</p>}
-            <Button onClick={save} disabled={!r || !canSave || saving} className="w-full">{saving ? 'Saving…' : 'Save analysis'}</Button>
+            <Button onClick={save} disabled={!r || !canSave || saving} className="h-10 w-full">{saving ? 'Saving…' : 'Save analysis'}</Button>
             {!canSave && <p className="text-[11.5px] text-muted">Your role can run analyses but not save them.</p>}
-            <p className="text-[11px] leading-relaxed text-muted/80">{r?.disclaimer}</p>
+            <p className="text-[10.5px] leading-relaxed text-faint">{r?.disclaimer}</p>
           </div>
-        </Panel>
+          </div>
+        </section>
       </div>
     </div>
   );

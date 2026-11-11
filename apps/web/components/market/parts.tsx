@@ -1,34 +1,46 @@
 import Link from 'next/link';
 import type { ConfidenceLabel, FlagSeverity, MetricUnit, RiskFlag, Verification } from '@northstar/market';
 import { Badge, cx } from '@/components/ui';
+import { IconBell, IconBook, IconCompare, IconEye, IconGlobe, IconScale, IconSliders } from '@/components/icons';
 
 export function scoreTone(s: number | null): 'positive' | 'signal' | 'caution' | 'critical' | 'neutral' {
   if (s === null) return 'neutral';
   return s >= 70 ? 'positive' : s >= 55 ? 'signal' : s >= 40 ? 'caution' : 'critical';
 }
 
-const barColor = { positive: 'bg-positive', signal: 'bg-signal', caution: 'bg-caution', critical: 'bg-critical', neutral: 'bg-muted/40' } as const;
 const textColor = { positive: 'text-positive', signal: 'text-signal', caution: 'text-caution', critical: 'text-critical', neutral: 'text-muted' } as const;
 
-/** Score with a thin bar. null renders as "Insufficient data", never as zero. */
+/** Score with a glowing bar. null renders as "Insufficient data", never as zero. */
 export function ScoreBar({ score, provisional, size = 'md' }: { score: number | null; provisional?: number; size?: 'sm' | 'md' | 'lg' }) {
   const t = scoreTone(score);
   const w = score ?? provisional ?? 0;
+  const color = `var(--color-${t === 'neutral' ? 'muted' : t})`;
   return (
-    <div className={cx('flex items-center gap-2', size === 'lg' && 'flex-col items-start gap-2')}>
-      <span className={cx('num tabular-nums', textColor[t], size === 'lg' ? 'text-[40px] font-medium leading-none' : size === 'sm' ? 'w-8 text-[12px]' : 'w-10 text-[13px]')}>
+    <div className={cx('flex items-center gap-2.5', size === 'lg' && 'flex-col items-start gap-2')}>
+      <span className={cx('num tabular-nums font-medium', textColor[t], size === 'lg' ? 'text-[40px] leading-none tracking-[-0.04em]' : size === 'sm' ? 'w-7 text-[12px]' : 'w-8 text-[14px]')}>
         {score === null ? '—' : score.toFixed(size === 'lg' ? 1 : 0)}
       </span>
-      <span className={cx('relative overflow-hidden rounded-full bg-graphite-2', size === 'lg' ? 'h-1.5 w-full' : size === 'sm' ? 'h-1 w-12' : 'h-1 w-20')} aria-hidden>
-        <span className={cx('absolute inset-y-0 left-0 rounded-full', score === null ? 'bg-muted/25' : barColor[t])} style={{ width: `${Math.max(0, Math.min(100, w))}%` }} />
+      <span className={cx('relative overflow-hidden rounded-full bg-graphite-3/80', size === 'lg' ? 'h-1.5 w-full' : size === 'sm' ? 'h-1 w-12' : 'h-[5px] w-24')} aria-hidden>
+        <span
+          className={cx('absolute inset-y-0 left-0 rounded-full', score === null && 'bg-muted/25')}
+          style={{ width: `${Math.max(0, Math.min(100, w))}%`, ...(score === null ? {} : { background: `linear-gradient(90deg, color-mix(in oklab, ${color} 35%, transparent), ${color})`, boxShadow: `0 0 8px ${color}` }) }}
+        />
       </span>
     </div>
   );
 }
 
+/** Category score as a heat-tinted cell. */
 export function CategoryCell({ score }: { score: number | null }) {
   const t = scoreTone(score);
-  return <span className={cx('num text-[12px]', score === null ? 'text-muted/60' : textColor[t])} title={score === null ? 'Insufficient data (coverage below 60%)' : undefined}>{score === null ? 'n/a' : Math.round(score)}</span>;
+  if (score === null) return <span className="num inline-flex h-6 min-w-9 items-center justify-center rounded-[5px] border border-dashed border-line-strong px-1.5 text-[11px] text-faint" title="Insufficient data (coverage below 60%)">n/a</span>;
+  const color = `var(--color-${t === 'neutral' ? 'muted' : t})`;
+  const alpha = 6 + Math.round((Math.max(0, Math.min(100, score)) / 100) * 16);
+  return (
+    <span className={cx('num inline-flex h-6 min-w-9 items-center justify-center rounded-[5px] px-1.5 text-[12px] font-medium', textColor[t])} style={{ background: `color-mix(in oklab, ${color} ${alpha}%, transparent)`, boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${color} ${alpha + 8}%, transparent)` }}>
+      {Math.round(score)}
+    </span>
+  );
 }
 
 const CONF: Record<ConfidenceLabel, { label: string; tone: 'positive' | 'signal' | 'caution' | 'critical' }> = {
@@ -95,21 +107,25 @@ export function formatMetric(v: number | null, unit: MetricUnit): string {
 
 export function MarketTabs({ active }: { active: 'explore' | 'compare' | 'regulatory' | 'property' | 'watchlists' | 'profiles' | 'sources' }) {
   const tabs = [
-    { k: 'explore', href: '/app/market', label: 'Explore' },
-    { k: 'compare', href: '/app/market/compare', label: 'Compare' },
-    { k: 'regulatory', href: '/app/market/regulatory', label: 'Landlord Regulatory Index' },
-    { k: 'property', href: '/app/market/property', label: 'Undervaluation evidence' },
-    { k: 'watchlists', href: '/app/market/watchlists', label: 'Monitoring' },
-    { k: 'profiles', href: '/app/market/profiles', label: 'Score profiles' },
-    { k: 'sources', href: '/app/market/sources', label: 'Sources & method' },
+    { k: 'explore', href: '/app/market', label: 'Explore', Icon: IconGlobe },
+    { k: 'compare', href: '/app/market/compare', label: 'Compare', Icon: IconCompare },
+    { k: 'regulatory', href: '/app/market/regulatory', label: 'Landlord Regulatory Index', Icon: IconScale },
+    { k: 'property', href: '/app/market/property', label: 'Undervaluation evidence', Icon: IconEye },
+    { k: 'watchlists', href: '/app/market/watchlists', label: 'Monitoring', Icon: IconBell },
+    { k: 'profiles', href: '/app/market/profiles', label: 'Score profiles', Icon: IconSliders },
+    { k: 'sources', href: '/app/market/sources', label: 'Sources & method', Icon: IconBook },
   ] as const;
   return (
-    <nav className="-mt-3 mb-6 flex gap-1 overflow-x-auto border-b border-line" aria-label="Market Intelligence">
-      {tabs.map((t) => (
-        <Link key={t.k} href={t.href} aria-current={active === t.k ? 'page' : undefined} className={cx('-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-[13px] transition-colors', active === t.k ? 'border-signal text-titanium' : 'border-transparent text-muted hover:text-titanium')}>
-          {t.label}
-        </Link>
-      ))}
+    <nav className="-mt-2 mb-6 flex w-fit max-w-full gap-0.5 overflow-x-auto rounded-xl border border-line/80 bg-void/50 p-1 shadow-[inset_0_1px_2px_rgb(0_0_0/0.3)]" aria-label="Market Intelligence">
+      {tabs.map((t) => {
+        const on = active === t.k;
+        return (
+          <Link key={t.k} href={t.href} aria-current={on ? 'page' : undefined} className={cx('flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-1.5 text-[12.5px] transition-all', on ? 'bg-graphite-3 text-arctic shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_0_0_1px_rgb(86_137_255/0.25),0_4px_14px_-6px_rgb(86_137_255/0.6)]' : 'text-muted hover:bg-graphite-2/60 hover:text-titanium')}>
+            <span className={on ? 'text-signal' : 'text-faint'}><t.Icon size={13} /></span>
+            {t.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }
