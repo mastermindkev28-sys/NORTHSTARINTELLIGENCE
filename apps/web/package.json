@@ -17,12 +17,14 @@
     "@northstar/core": "workspace:*",
     "@northstar/db": "workspace:*",
     "@northstar/integrations": "workspace:*",
+    "@northstar/market": "workspace:*",
     "@northstar/underwriting": "workspace:*",
     "geist": "1.5.1",
     "next": "16.4.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "server-only": "0.0.1"
+    "server-only": "0.0.1",
+    "zod": "4.1.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.17",

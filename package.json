@@ -10,7 +10,7 @@
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "test:unit": "pnpm --filter @northstar/underwriting --filter @northstar/core --filter @northstar/integrations test",
+    "test:unit": "pnpm --filter @northstar/underwriting --filter @northstar/core --filter @northstar/integrations --filter @northstar/market test",
     "db:migrate": "pnpm --filter @northstar/db migrate",
     "db:seed": "pnpm --filter @northstar/db seed",
     "dev": "pnpm --filter @northstar/web dev",
