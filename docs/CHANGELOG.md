@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — Market Intelligence
+
+### Added
+- **`@northstar/market`**: metric allow-list with fair-housing guardrails, source catalog, Landlord Regulatory Index (14 cited factors, append-only rows, effective dates, user weights), transparent Market Score (6 categories, confidence, coverage, conservative missing-data handling), risk flags never averaged into scores, 10 strategy profiles plus custom profiles, relative/absolute normalization, trends, five-signal undervaluation evidence, monitoring rules with deduped evidence-carrying alerts, labeled demo dataset. 63 tests, 98% line coverage.
+- **Migration 0005**: geo_areas, geo_metric_observations (protected-metric check constraint), append-only regulatory_factors, market_score_profiles, market_watchlists, market_watchlist_items, market_alert_rules, market_alerts; shared `app.investment_strategy` enum and `northstar_ingest` role. Seed script for cited pilot rows. 11 RLS tests.
+- **Workspace** at `/app/market`: explorer, area profiles, compare, Landlord Regulatory Index, undervaluation workbench, monitoring and alerts, score profiles, sources and methodology. E2E `e2e/market.mjs`.
+- **Docs**: MARKET_INTELLIGENCE_ENGINE.md.
+
 ## 0.1.0 (unreleased) — Platform foundation
 
 ### Added

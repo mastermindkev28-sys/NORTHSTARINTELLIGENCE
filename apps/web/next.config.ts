@@ -9,7 +9,7 @@ const securityHeaders = [
 ];
 
 const config: NextConfig = {
-  transpilePackages: ['@northstar/core', '@northstar/db', '@northstar/integrations', '@northstar/underwriting'],
+  transpilePackages: ['@northstar/core', '@northstar/db', '@northstar/integrations', '@northstar/market', '@northstar/underwriting'],
   serverExternalPackages: ['pg'],
   poweredByHeader: false,
   typedRoutes: false,

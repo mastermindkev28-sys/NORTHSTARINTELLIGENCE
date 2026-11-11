@@ -4,14 +4,23 @@
   "private": true,
   "type": "module",
   "description": "PostgreSQL schema, migrations, tenant-scoped data access, and RLS tests.",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "lint": "tsc -p tsconfig.json --noUnusedLocals --noUnusedParameters",
     "test": "vitest run",
     "migrate": "tsx scripts/migrate.ts",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "seed:market": "tsx scripts/seed-market.ts"
   },
-  "dependencies": { "pg": "8.16.3" },
-  "devDependencies": { "@types/pg": "8.15.5", "tsx": "4.20.6" }
+  "dependencies": {
+    "pg": "8.16.3"
+  },
+  "devDependencies": {
+    "@types/pg": "8.15.5",
+    "tsx": "4.20.6",
+    "@northstar/market": "workspace:*"
+  }
 }
