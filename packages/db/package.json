@@ -1,0 +1,13 @@
+{
+  "name": "@northstar/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": { "@northstar/core": "workspace:*", "@northstar/workflows": "workspace:*", "pg": "^8.16.3" }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "northstar-intelligence",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Northstar Intelligence — the intelligence infrastructure for real estate.",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "scripts": {
+    "typecheck": "pnpm -r --parallel typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:db": "vitest run --project db",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:migrate": "pnpm --filter @northstar/db migrate",
+    "db:local": "bash scripts/local-postgres.sh",
+    "dev": "pnpm --filter @northstar/web dev",
+    "build": "pnpm --filter @northstar/web build",
+    "ci": "pnpm typecheck && pnpm lint && pnpm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@types/node": "^22.19.0",
+    "@vitest/coverage-v8": "5.0.5",
+    "eslint": "^9.39.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "5.0.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "@tailwindcss/oxide"
+    ]
+  }
+}
