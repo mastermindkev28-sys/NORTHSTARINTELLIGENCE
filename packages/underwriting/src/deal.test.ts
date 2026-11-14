@@ -7,10 +7,34 @@ const baseInput: WholesaleDealInput = {
   arv: {
     method: "comps",
     comps: [
-      { id: "c1", salePrice: 300_000, livingAreaSqft: 1500, saleDate: "2026-09-10", distanceMiles: 0.3 },
-      { id: "c2", salePrice: 312_000, livingAreaSqft: 1560, saleDate: "2026-08-20", distanceMiles: 0.5 },
-      { id: "c3", salePrice: 290_000, livingAreaSqft: 1450, saleDate: "2026-10-05", distanceMiles: 0.2 },
-      { id: "c4", salePrice: 305_000, livingAreaSqft: 1525, saleDate: "2026-07-30", distanceMiles: 0.6 },
+      {
+        id: "c1",
+        salePrice: 300_000,
+        livingAreaSqft: 1500,
+        saleDate: "2026-09-10",
+        distanceMiles: 0.3,
+      },
+      {
+        id: "c2",
+        salePrice: 312_000,
+        livingAreaSqft: 1560,
+        saleDate: "2026-08-20",
+        distanceMiles: 0.5,
+      },
+      {
+        id: "c3",
+        salePrice: 290_000,
+        livingAreaSqft: 1450,
+        saleDate: "2026-10-05",
+        distanceMiles: 0.2,
+      },
+      {
+        id: "c4",
+        salePrice: 305_000,
+        livingAreaSqft: 1525,
+        saleDate: "2026-07-30",
+        distanceMiles: 0.6,
+      },
     ],
   },
   rehab: { method: "manual", value: 40_000, origin: "user_assumption" },
@@ -35,11 +59,15 @@ describe("underwriteWholesaleDeal", () => {
   });
 
   it("is reproducible", () => {
-    expect(JSON.stringify(underwriteWholesaleDeal(baseInput))).toBe(JSON.stringify(underwriteWholesaleDeal(baseInput)));
+    expect(JSON.stringify(underwriteWholesaleDeal(baseInput))).toBe(
+      JSON.stringify(underwriteWholesaleDeal(baseInput)),
+    );
   });
 
   it("negotiate vs pass thresholds", () => {
-    expect(underwriteWholesaleDeal({ ...baseInput, askingPrice: 170_000 }).decision).toBe("negotiate");
+    expect(underwriteWholesaleDeal({ ...baseInput, askingPrice: 170_000 }).decision).toBe(
+      "negotiate",
+    );
     expect(underwriteWholesaleDeal({ ...baseInput, askingPrice: 200_000 }).decision).toBe("pass");
   });
 
@@ -50,31 +78,51 @@ describe("underwriteWholesaleDeal", () => {
   });
 
   it("flags AI-sourced ARV", () => {
-    const r = underwriteWholesaleDeal({ ...baseInput, arv: { method: "manual", value: 300_000, origin: "ai_generated" } });
+    const r = underwriteWholesaleDeal({
+      ...baseInput,
+      arv: { method: "manual", value: 300_000, origin: "ai_generated" },
+    });
     expect(r.warnings.join(" ")).toMatch(/AI interpretation/);
     expect(r.arv.origin).toBe("ai_generated");
   });
 
   it("includes end-buyer financing costs when provided", () => {
-    const withFin = underwriteWholesaleDeal({ ...baseInput, assumptions: { ...baseInput.assumptions, endBuyerFinancing: { maxLtc: 0.9, maxLtv: 0.7, annualRate: 0.12 } } });
+    const withFin = underwriteWholesaleDeal({
+      ...baseInput,
+      assumptions: {
+        ...baseInput.assumptions,
+        endBuyerFinancing: { maxLtc: 0.9, maxLtv: 0.7, annualRate: 0.12 },
+      },
+    });
     const without = underwriteWholesaleDeal(baseInput);
     expect(withFin.endBuyerCosts!.financing).toBeGreaterThan(0);
     expect(withFin.maoCostBased!).toBeLessThan(without.maoCostBased!);
   });
 
   it("passes when costs exceed value", () => {
-    const r = underwriteWholesaleDeal({ ...baseInput, rehab: { method: "manual", value: 250_000, origin: "user_assumption" } });
+    const r = underwriteWholesaleDeal({
+      ...baseInput,
+      rehab: { method: "manual", value: 250_000, origin: "user_assumption" },
+    });
     expect(r.recommendedMaxOffer).toBe(0);
     expect(r.decision).toBe("pass");
   });
 
   it("rejects malformed input at the boundary", () => {
     expect(() => underwriteWholesaleDeal({ ...baseInput, asOf: "not-a-date" })).toThrow();
-    expect(() => underwriteWholesaleDeal({ ...baseInput, assumptions: { arvFactor: 70 } })).toThrow();
+    expect(() =>
+      underwriteWholesaleDeal({ ...baseInput, assumptions: { arvFactor: 70 } }),
+    ).toThrow();
   });
 
   it("downgrades pursue when comp confidence is insufficient", () => {
-    const r = underwriteWholesaleDeal({ ...baseInput, arv: { method: "comps", comps: baseInput.arv.method === "comps" ? baseInput.arv.comps.slice(0, 2) : [] } });
+    const r = underwriteWholesaleDeal({
+      ...baseInput,
+      arv: {
+        method: "comps",
+        comps: baseInput.arv.method === "comps" ? baseInput.arv.comps.slice(0, 2) : [],
+      },
+    });
     expect(r.decision).toBe("negotiate");
     expect(r.decisionReasons.join(" ")).toMatch(/confidence/);
   });

@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { ValueOrigin, type ValueOrigin as ValueOriginT } from "@northstar/core";
 import { estimateArv, type ArvResult } from "./arv";
-import { dispositionCosts, holdingCosts, shortTermFinancingCosts, sizeShortTermLoan } from "./costs";
+import {
+  dispositionCosts,
+  holdingCosts,
+  shortTermFinancingCosts,
+  sizeShortTermLoan,
+} from "./costs";
 import { maoCostBased, maoRuleOfThumb } from "./flip";
 import { estimateRehab, type RehabEstimate } from "./rehab";
 import { METHODOLOGY_VERSION, Trace, type TraceStep } from "./trace";
@@ -20,7 +25,14 @@ const CompSchema = z.object({
   bathrooms: z.number().min(0).optional(),
   yearBuilt: z.number().int().optional(),
   adjustments: z.array(z.object({ label: z.string(), amount: z.number() })).optional(),
-  source: z.object({ system: z.string(), recordId: z.string().optional(), retrievedAt: z.string(), reference: z.string().optional() }).optional(),
+  source: z
+    .object({
+      system: z.string(),
+      recordId: z.string().optional(),
+      retrievedAt: z.string(),
+      reference: z.string().optional(),
+    })
+    .optional(),
 });
 
 export const WholesaleDealInputSchema = z.object({
@@ -39,7 +51,12 @@ export const WholesaleDealInputSchema = z.object({
       maxAgeMonths: z.number().positive().optional(),
       sqftTolerance: rate(1).optional(),
     }),
-    z.object({ method: z.literal("manual"), value: usd, origin: ValueOrigin, note: z.string().optional() }),
+    z.object({
+      method: z.literal("manual"),
+      value: usd,
+      origin: ValueOrigin,
+      note: z.string().optional(),
+    }),
   ]),
   rehab: z.union([
     z.object({ method: z.literal("manual"), value: usd, origin: ValueOrigin }),
@@ -47,7 +64,15 @@ export const WholesaleDealInputSchema = z.object({
       method: z.literal("estimate"),
       scope: z.enum(["cosmetic", "moderate", "full", "gut"]).optional(),
       costPerSqft: z.number().positive().optional(),
-      lineItems: z.array(z.object({ category: z.string(), quantity: z.number().min(0), unitCost: z.number().min(0) })).optional(),
+      lineItems: z
+        .array(
+          z.object({
+            category: z.string(),
+            quantity: z.number().min(0),
+            unitCost: z.number().min(0),
+          }),
+        )
+        .optional(),
       contingencyRate: rate(0.5).optional(),
     }),
   ]),
@@ -64,7 +89,13 @@ export const WholesaleDealInputSchema = z.object({
     commissionRate: rate(0.15).default(0.05),
     sellerClosingRate: rate(0.15).default(0.015),
     endBuyerFinancing: z
-      .object({ maxLtc: rate(), maxLtv: rate(), annualRate: rate(), points: rate(0.1).default(0.02), lenderFees: usd.default(0) })
+      .object({
+        maxLtc: rate(),
+        maxLtv: rate(),
+        annualRate: rate(),
+        points: rate(0.1).default(0.02),
+        lenderFees: usd.default(0),
+      })
       .optional(),
   }),
 });
@@ -119,18 +150,36 @@ export function underwriteWholesaleDeal(rawInput: WholesaleDealInput): Wholesale
   let arvComps: ArvResult | undefined;
   if (input.arv.method === "comps") {
     arvComps = estimateArv(input.subject, input.arv.comps, {
-      asOf: input.asOf, maxDistanceMiles: input.arv.maxDistanceMiles, maxAgeMonths: input.arv.maxAgeMonths, sqftTolerance: input.arv.sqftTolerance,
+      asOf: input.asOf,
+      maxDistanceMiles: input.arv.maxDistanceMiles,
+      maxAgeMonths: input.arv.maxAgeMonths,
+      sqftTolerance: input.arv.sqftTolerance,
     });
     trace.merge(arvComps.trace);
     warnings.push(...arvComps.warnings);
     arvValue = arvComps.arv;
     arvOrigin = "calculated";
-    assumptions.push({ key: "arv", label: "After-repair value", value: arvValue, origin: "calculated", note: `${arvComps.included.length} comps, confidence ${arvComps.grade} (${arvComps.confidence})` });
+    assumptions.push({
+      key: "arv",
+      label: "After-repair value",
+      value: arvValue,
+      origin: "calculated",
+      note: `${arvComps.included.length} comps, confidence ${arvComps.grade} (${arvComps.confidence})`,
+    });
   } else {
     arvValue = input.arv.value;
     arvOrigin = input.arv.origin;
-    assumptions.push({ key: "arv", label: "After-repair value", value: arvValue, origin: arvOrigin, note: input.arv.note });
-    if (arvOrigin === "ai_generated") warnings.push("ARV was supplied by an AI interpretation and must be verified with comparable sales.");
+    assumptions.push({
+      key: "arv",
+      label: "After-repair value",
+      value: arvValue,
+      origin: arvOrigin,
+      note: input.arv.note,
+    });
+    if (arvOrigin === "ai_generated")
+      warnings.push(
+        "ARV was supplied by an AI interpretation and must be verified with comparable sales.",
+      );
   }
 
   // --- Rehab ---
@@ -141,16 +190,25 @@ export function underwriteWholesaleDeal(rawInput: WholesaleDealInput): Wholesale
     rehabValue = input.rehab.value;
     rehabOrigin = input.rehab.origin;
   } else {
-    rehabEstimate = estimateRehab({
-      livingAreaSqft: input.subject.livingAreaSqft,
-      scope: input.rehab.scope,
-      costPerSqftByScope: input.rehab.scope && input.rehab.costPerSqft ? { [input.rehab.scope]: input.rehab.costPerSqft } : undefined,
-      lineItems: input.rehab.lineItems,
-      contingencyRate: input.rehab.contingencyRate,
-    }, trace);
+    rehabEstimate = estimateRehab(
+      {
+        livingAreaSqft: input.subject.livingAreaSqft,
+        scope: input.rehab.scope,
+        costPerSqftByScope:
+          input.rehab.scope && input.rehab.costPerSqft
+            ? { [input.rehab.scope]: input.rehab.costPerSqft }
+            : undefined,
+        lineItems: input.rehab.lineItems,
+        contingencyRate: input.rehab.contingencyRate,
+      },
+      trace,
+    );
     rehabValue = rehabEstimate.total;
     rehabOrigin = "calculated";
-    if (rehabEstimate.isPlaceholderRate) warnings.push("Rehab estimate uses Northstar default $/sqft placeholders. Calibrate rates to your market and contractors.");
+    if (rehabEstimate.isPlaceholderRate)
+      warnings.push(
+        "Rehab estimate uses Northstar default $/sqft placeholders. Calibrate rates to your market and contractors.",
+      );
   }
   assumptions.push({ key: "rehab", label: "Rehab cost", value: rehabValue, origin: rehabOrigin });
 
@@ -165,52 +223,130 @@ export function underwriteWholesaleDeal(rawInput: WholesaleDealInput): Wholesale
   ] as const) {
     assumptions.push({ key, label, value, origin: "user_assumption" });
   }
-  if (input.askingPrice !== undefined) assumptions.push({ key: "askingPrice", label: "Seller asking price", value: input.askingPrice, origin: "user_assumption", note: "As stated by seller; confirm in writing." });
+  if (input.askingPrice !== undefined)
+    assumptions.push({
+      key: "askingPrice",
+      label: "Seller asking price",
+      value: input.askingPrice,
+      origin: "user_assumption",
+      note: "As stated by seller; confirm in writing.",
+    });
 
   if (arvValue === null) {
     return {
-      methodologyVersion: METHODOLOGY_VERSION, arv: { value: null, origin: arvOrigin, comps: arvComps }, rehab: { value: rehabValue, origin: rehabOrigin, estimate: rehabEstimate },
-      maoRuleOfThumb: null, maoCostBased: null, recommendedMaxOffer: null, spreadToAsking: null, endBuyerCosts: null,
-      decision: "insufficient_data", decisionReasons: ["ARV could not be determined from the available comparable sales."],
-      assumptions, warnings, limitations: LIMITATIONS, trace: trace.steps,
+      methodologyVersion: METHODOLOGY_VERSION,
+      arv: { value: null, origin: arvOrigin, comps: arvComps },
+      rehab: { value: rehabValue, origin: rehabOrigin, estimate: rehabEstimate },
+      maoRuleOfThumb: null,
+      maoCostBased: null,
+      recommendedMaxOffer: null,
+      spreadToAsking: null,
+      endBuyerCosts: null,
+      decision: "insufficient_data",
+      decisionReasons: ["ARV could not be determined from the available comparable sales."],
+      assumptions,
+      warnings,
+      limitations: LIMITATIONS,
+      trace: trace.steps,
     };
   }
 
   // --- MAO ---
-  const rule = maoRuleOfThumb({ arv: arvValue, repairCost: rehabValue, arvFactor: a.arvFactor, assignmentFee: a.targetAssignmentFee }, trace);
-  const holding = holdingCosts({ months: a.holdMonths, annualPropertyTax: a.annualPropertyTax, annualInsurance: a.annualInsurance, monthlyUtilities: a.monthlyUtilities }, trace).total;
+  const rule = maoRuleOfThumb(
+    {
+      arv: arvValue,
+      repairCost: rehabValue,
+      arvFactor: a.arvFactor,
+      assignmentFee: a.targetAssignmentFee,
+    },
+    trace,
+  );
+  const holding = holdingCosts(
+    {
+      months: a.holdMonths,
+      annualPropertyTax: a.annualPropertyTax,
+      annualInsurance: a.annualInsurance,
+      monthlyUtilities: a.monthlyUtilities,
+    },
+    trace,
+  ).total;
   let financing = 0;
   if (a.endBuyerFinancing) {
     // Size the loan against the rule-based end-buyer price as a stable basis (avoids circularity with cost-based MAO).
     const basisPrice = Math.max(rule + a.targetAssignmentFee, 0);
-    const loan = sizeShortTermLoan({ purchasePrice: basisPrice, rehabCost: rehabValue, arv: arvValue, maxLtc: a.endBuyerFinancing.maxLtc, maxLtv: a.endBuyerFinancing.maxLtv, financeRehab: true }, trace);
-    financing = shortTermFinancingCosts({ loanAmount: loan, annualRate: a.endBuyerFinancing.annualRate, points: a.endBuyerFinancing.points, lenderFees: a.endBuyerFinancing.lenderFees, months: a.holdMonths }, trace).total;
+    const loan = sizeShortTermLoan(
+      {
+        purchasePrice: basisPrice,
+        rehabCost: rehabValue,
+        arv: arvValue,
+        maxLtc: a.endBuyerFinancing.maxLtc,
+        maxLtv: a.endBuyerFinancing.maxLtv,
+        financeRehab: true,
+      },
+      trace,
+    );
+    financing = shortTermFinancingCosts(
+      {
+        loanAmount: loan,
+        annualRate: a.endBuyerFinancing.annualRate,
+        points: a.endBuyerFinancing.points,
+        lenderFees: a.endBuyerFinancing.lenderFees,
+        months: a.holdMonths,
+      },
+      trace,
+    ).total;
   }
-  const disposition = dispositionCosts({ salePrice: arvValue, commissionRate: a.commissionRate, sellerClosingRate: a.sellerClosingRate }, trace);
-  const cost = maoCostBased({
-    arv: arvValue, repairCost: rehabValue, targetProfit: { type: "arv_rate", value: a.endBuyerProfitRate },
-    buyerClosingRate: a.endBuyerClosingRate, holdingCost: holding, financingCost: financing, dispositionCost: disposition, assignmentFee: a.targetAssignmentFee,
-  }, trace);
+  const disposition = dispositionCosts(
+    {
+      salePrice: arvValue,
+      commissionRate: a.commissionRate,
+      sellerClosingRate: a.sellerClosingRate,
+    },
+    trace,
+  );
+  const cost = maoCostBased(
+    {
+      arv: arvValue,
+      repairCost: rehabValue,
+      targetProfit: { type: "arv_rate", value: a.endBuyerProfitRate },
+      buyerClosingRate: a.endBuyerClosingRate,
+      holdingCost: holding,
+      financingCost: financing,
+      dispositionCost: disposition,
+      assignmentFee: a.targetAssignmentFee,
+    },
+    trace,
+  );
 
   const recommended = trace.record({
-    key: "recommended_max_offer", label: "Recommended maximum offer", formula: "max(0, min(MAO rule, MAO cost-based)) rounded down to $500",
-    inputs: { rule, cost }, result: Math.max(0, Math.floor(Math.min(rule, cost) / 500) * 500), unit: "usd",
+    key: "recommended_max_offer",
+    label: "Recommended maximum offer",
+    formula: "max(0, min(MAO rule, MAO cost-based)) rounded down to $500",
+    inputs: { rule, cost },
+    result: Math.max(0, Math.floor(Math.min(rule, cost) / 500) * 500),
+    unit: "usd",
   });
   const spread = input.askingPrice === undefined ? null : recommended - input.askingPrice;
 
   let decision: WholesaleDealResult["decision"];
   if (recommended <= 0) {
     decision = "pass";
-    reasons.push("Costs and required margins exceed ARV; no positive offer supports the target assignment fee.");
+    reasons.push(
+      "Costs and required margins exceed ARV; no positive offer supports the target assignment fee.",
+    );
   } else if (spread === null) {
     decision = "negotiate";
-    reasons.push("No asking price recorded; use the recommended maximum offer as the negotiation ceiling.");
+    reasons.push(
+      "No asking price recorded; use the recommended maximum offer as the negotiation ceiling.",
+    );
   } else if (spread >= 0) {
     decision = "pursue";
     reasons.push(`Asking price is ${spread === 0 ? "at" : "below"} the recommended maximum offer.`);
   } else if (input.askingPrice !== undefined && -spread / input.askingPrice <= 0.1) {
     decision = "negotiate";
-    reasons.push(`Asking price is within 10% of the recommended maximum offer (gap ${Math.round(-spread).toLocaleString("en-US")}).`);
+    reasons.push(
+      `Asking price is within 10% of the recommended maximum offer (gap ${Math.round(-spread).toLocaleString("en-US")}).`,
+    );
   } else {
     decision = "pass";
     reasons.push("Asking price exceeds the recommended maximum offer by more than 10%.");

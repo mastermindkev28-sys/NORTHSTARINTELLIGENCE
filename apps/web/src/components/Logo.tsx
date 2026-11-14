@@ -20,7 +20,9 @@ export function Wordmark() {
       <NorthstarMark />
       <div className="leading-none">
         <div className="text-[13px] font-semibold tracking-[0.22em] text-arctic">NORTHSTAR</div>
-        <div className="mt-1 text-[9.5px] font-medium tracking-[0.34em] text-muted">INTELLIGENCE</div>
+        <div className="mt-1 text-[9.5px] font-medium tracking-[0.34em] text-muted">
+          INTELLIGENCE
+        </div>
       </div>
     </div>
   );

@@ -18,7 +18,20 @@ export interface OptOutClassification {
   needsReview: boolean;
 }
 
-const STOP_KEYWORDS = new Set(["stop", "stopall", "stop all", "unsubscribe", "cancel", "end", "quit", "revoke", "optout", "opt out", "opt-out", "remove"]);
+const STOP_KEYWORDS = new Set([
+  "stop",
+  "stopall",
+  "stop all",
+  "unsubscribe",
+  "cancel",
+  "end",
+  "quit",
+  "revoke",
+  "optout",
+  "opt out",
+  "opt-out",
+  "remove",
+]);
 const START_KEYWORDS = new Set(["start", "unstop", "yes", "subscribe"]);
 const HELP_KEYWORDS = new Set(["help", "info"]);
 
@@ -37,11 +50,19 @@ const REVOCATION_PHRASES: RegExp[] = [
 const HOSTILE = /\b(lawyer|attorney|sue|lawsuit|harass\w*|police|fcc|ftc|attorney general)\b/i;
 
 export function classifyInbound(body: string): OptOutClassification {
-  const normalized = body.normalize("NFKC").trim().toLowerCase().replace(/[.!?,;:"'*]+$/g, "").replace(/\s+/g, " ");
+  const normalized = body
+    .normalize("NFKC")
+    .trim()
+    .toLowerCase()
+    .replace(/[.!?,;:"'*]+$/g, "")
+    .replace(/\s+/g, " ");
   const hostile = HOSTILE.test(body);
-  if (STOP_KEYWORDS.has(normalized)) return { intent: "opt_out", matchType: "keyword", matched: normalized, needsReview: hostile };
-  if (START_KEYWORDS.has(normalized)) return { intent: "opt_in", matchType: "keyword", matched: normalized, needsReview: false };
-  if (HELP_KEYWORDS.has(normalized)) return { intent: "help", matchType: "keyword", matched: normalized, needsReview: false };
+  if (STOP_KEYWORDS.has(normalized))
+    return { intent: "opt_out", matchType: "keyword", matched: normalized, needsReview: hostile };
+  if (START_KEYWORDS.has(normalized))
+    return { intent: "opt_in", matchType: "keyword", matched: normalized, needsReview: false };
+  if (HELP_KEYWORDS.has(normalized))
+    return { intent: "help", matchType: "keyword", matched: normalized, needsReview: false };
   // Keyword as the first word ("STOP please", "Stop.") counts as a revocation.
   const firstWord = normalized.split(" ")[0] ?? "";
   if (["stop", "unsubscribe", "stopall", "quit", "cancel", "optout"].includes(firstWord)) {

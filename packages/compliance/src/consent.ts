@@ -40,17 +40,35 @@ export interface ConsentStatus {
 
 const INQUIRY_EBR_DAYS = 90;
 
-export function resolveConsent(records: readonly ConsentRecord[], channel: Channel, now: Date): ConsentStatus {
+export function resolveConsent(
+  records: readonly ConsentRecord[],
+  channel: Channel,
+  now: Date,
+): ConsentStatus {
   const relevant = records.filter((r) => r.channel === channel);
   const active = relevant.filter((r) => !r.revokedAt || Date.parse(r.revokedAt) > now.getTime());
   const latestGrant = Math.max(0, ...relevant.map((r) => Date.parse(r.capturedAt)));
-  const latestRevocation = Math.max(0, ...relevant.filter((r) => r.revokedAt).map((r) => Date.parse(r.revokedAt as string)));
+  const latestRevocation = Math.max(
+    0,
+    ...relevant.filter((r) => r.revokedAt).map((r) => Date.parse(r.revokedAt as string)),
+  );
   const revoked = latestRevocation > 0 && latestRevocation >= latestGrant;
-  if (revoked) return { hasExpressWritten: false, hasExpress: false, hasActiveInquiry: false, revoked: true, basis: null };
+  if (revoked)
+    return {
+      hasExpressWritten: false,
+      hasExpress: false,
+      hasActiveInquiry: false,
+      revoked: true,
+      basis: null,
+    };
 
   const ew = active.find((r) => r.kind === "express_written" && !!r.disclosureText);
   const ex = active.find((r) => r.kind === "express");
-  const inquiry = active.find((r) => r.kind === "inquiry" && now.getTime() - Date.parse(r.capturedAt) <= INQUIRY_EBR_DAYS * 86_400_000);
+  const inquiry = active.find(
+    (r) =>
+      r.kind === "inquiry" &&
+      now.getTime() - Date.parse(r.capturedAt) <= INQUIRY_EBR_DAYS * 86_400_000,
+  );
   return {
     hasExpressWritten: !!ew,
     hasExpress: !!ew || !!ex,

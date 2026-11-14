@@ -1,7 +1,14 @@
 import type { Actor, Logger, Permission, TenantContext } from "@northstar/core";
 import type { z } from "zod";
 
-export type RunStatus = "queued" | "running" | "sleeping" | "awaiting_approval" | "succeeded" | "cancelled" | "dead_lettered";
+export type RunStatus =
+  | "queued"
+  | "running"
+  | "sleeping"
+  | "awaiting_approval"
+  | "succeeded"
+  | "cancelled"
+  | "dead_lettered";
 export const TERMINAL_STATUSES: readonly RunStatus[] = ["succeeded", "cancelled", "dead_lettered"];
 
 export interface DomainEvent<P = unknown> {
@@ -116,21 +123,47 @@ export interface WorkflowStore {
   /** Idempotent on (workflowId, eventId). */
   createRun(run: NewRun): Promise<{ run: WorkflowRun; inserted: boolean }>;
   /** Atomically lease due runs across all tenants (worker-only operation). */
-  claimDueRuns(params: { now: Date; limit: number; workerId: string; leaseMs: number }): Promise<WorkflowRun[]>;
+  claimDueRuns(params: {
+    now: Date;
+    limit: number;
+    workerId: string;
+    leaseMs: number;
+  }): Promise<WorkflowRun[]>;
   getRun(organizationId: string, runId: string): Promise<WorkflowRun | null>;
   /** Update a run the caller holds the lease for. Returns false if the lease was lost. */
-  updateRun(organizationId: string, runId: string, workerId: string | null, patch: Partial<Omit<WorkflowRun, "id" | "organizationId">>): Promise<boolean>;
-  listRuns(organizationId: string, filter?: { status?: RunStatus; workflowId?: string; limit?: number }): Promise<WorkflowRun[]>;
+  updateRun(
+    organizationId: string,
+    runId: string,
+    workerId: string | null,
+    patch: Partial<Omit<WorkflowRun, "id" | "organizationId">>,
+  ): Promise<boolean>;
+  listRuns(
+    organizationId: string,
+    filter?: { status?: RunStatus; workflowId?: string; limit?: number },
+  ): Promise<WorkflowRun[]>;
   getStep(organizationId: string, runId: string, name: string): Promise<StepRecord | null>;
   saveStep(record: StepRecord): Promise<void>;
   insertDeadLetter(dl: DeadLetter): Promise<void>;
   listDeadLetters(organizationId: string): Promise<DeadLetter[]>;
   /** Idempotent on (runId, stepName). */
   createApproval(a: ApprovalRequest): Promise<ApprovalRequest>;
-  getApprovalForStep(organizationId: string, runId: string, stepName: string): Promise<ApprovalRequest | null>;
+  getApprovalForStep(
+    organizationId: string,
+    runId: string,
+    stepName: string,
+  ): Promise<ApprovalRequest | null>;
   getApproval(organizationId: string, approvalId: string): Promise<ApprovalRequest | null>;
   /** Only transitions pending → approved/rejected. Returns null if already decided. */
-  decideApproval(organizationId: string, approvalId: string, decision: { status: "approved" | "rejected"; decidedBy: string; reason: string | null; at: string }): Promise<ApprovalRequest | null>;
+  decideApproval(
+    organizationId: string,
+    approvalId: string,
+    decision: {
+      status: "approved" | "rejected";
+      decidedBy: string;
+      reason: string | null;
+      at: string;
+    },
+  ): Promise<ApprovalRequest | null>;
   listApprovals(organizationId: string, status?: ApprovalStatus): Promise<ApprovalRequest[]>;
   appendLog(log: ExecutionLog): Promise<void>;
   listLogs(organizationId: string, runId: string): Promise<ExecutionLog[]>;
@@ -143,7 +176,10 @@ export interface StepTools {
   /** Durable sleep: suspends the run until `at`. */
   sleepUntil(name: string, at: Date): Promise<void>;
   /** Suspends until a human with `requiredPermission` approves. Throws ApprovalRejectedError if rejected. */
-  waitForApproval(name: string, req: { summary: string; requiredPermission: Permission; payload?: unknown }): Promise<{ decidedBy: string; reason: string | null }>;
+  waitForApproval(
+    name: string,
+    req: { summary: string; requiredPermission: Permission; payload?: unknown },
+  ): Promise<{ decidedBy: string; reason: string | null }>;
   /** Emit a follow-on event exactly once for this run + step. */
   emit(name: string, type: string, payload: unknown): Promise<void>;
   /** Stable key for idempotent external side effects (e.g., message send) in this step. */

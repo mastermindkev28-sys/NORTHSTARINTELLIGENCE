@@ -12,18 +12,49 @@ export default async function LeadsPage() {
     <>
       <PageHeader eyebrow="Northstar Acquire" title="Lead intelligence" />
       <Panel>
-        <Table head={["Seller", "Property", "Source", "Score", "Completeness", "Stage", "ARV", "Max offer", "Decision"]}>
+        <Table
+          head={[
+            "Seller",
+            "Property",
+            "Source",
+            "Score",
+            "Completeness",
+            "Stage",
+            "ARV",
+            "Max offer",
+            "Decision",
+          ]}
+        >
           {leads.map((l) => (
             <tr key={l.id} className="hover:bg-graphite-2/50">
-              <td className="px-3 py-2.5"><Link href={`/leads/${l.id}`} className="text-arctic hover:text-signal">{l.fullName ?? "Unknown"}</Link></td>
-              <td className="px-3 py-2.5 text-muted">{l.property ? `${l.property.line1}, ${l.property.city} ${l.property.state}` : "—"}</td>
+              <td className="px-3 py-2.5">
+                <Link href={`/leads/${l.id}`} className="text-arctic hover:text-signal">
+                  {l.fullName ?? "Unknown"}
+                </Link>
+              </td>
+              <td className="px-3 py-2.5 text-muted">
+                {l.property ? `${l.property.line1}, ${l.property.city} ${l.property.state}` : "—"}
+              </td>
               <td className="px-3 py-2.5 text-titanium/80">{title(l.source)}</td>
-              <td className="px-3 py-2.5 whitespace-nowrap"><span className="num mr-2">{l.score}</span><Pill tone={tierTone(l.tier)}>{l.tier}</Pill></td>
+              <td className="px-3 py-2.5 whitespace-nowrap">
+                <span className="num mr-2">{l.score}</span>
+                <Pill tone={tierTone(l.tier)}>{l.tier}</Pill>
+              </td>
               <td className="num px-3 py-2.5 text-muted">{Math.round(l.completeness * 100)}%</td>
-              <td className="px-3 py-2.5">{l.status === "duplicate" ? <Pill tone="caution">Duplicate</Pill> : title(l.status)}</td>
+              <td className="px-3 py-2.5">
+                {l.status === "duplicate" ? <Pill tone="caution">Duplicate</Pill> : title(l.status)}
+              </td>
               <td className="num px-3 py-2.5">{usd(l.underwriting?.arv.value)}</td>
               <td className="num px-3 py-2.5">{usd(l.underwriting?.recommendedMaxOffer)}</td>
-              <td className="px-3 py-2.5">{l.underwriting ? <Pill tone={decisionTone(l.underwriting.decision)}>{title(l.underwriting.decision)}</Pill> : "—"}</td>
+              <td className="px-3 py-2.5">
+                {l.underwriting ? (
+                  <Pill tone={decisionTone(l.underwriting.decision)}>
+                    {title(l.underwriting.decision)}
+                  </Pill>
+                ) : (
+                  "—"
+                )}
+              </td>
             </tr>
           ))}
         </Table>

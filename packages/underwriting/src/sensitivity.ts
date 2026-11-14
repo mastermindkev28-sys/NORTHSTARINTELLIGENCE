@@ -8,11 +8,13 @@ export function withValue<T extends object>(base: T, path: string, value: number
   for (let i = 0; i < keys.length - 1; i++) {
     const k = keys[i] as string;
     const next = node[k];
-    if (next === null || typeof next !== "object") throw new CalculationInputError(`Path "${path}" not found at "${k}"`);
+    if (next === null || typeof next !== "object")
+      throw new CalculationInputError(`Path "${path}" not found at "${k}"`);
     node = next as Record<string, unknown>;
   }
   const leaf = keys[keys.length - 1] as string;
-  if (typeof node[leaf] !== "number" && node[leaf] !== undefined) throw new CalculationInputError(`Path "${path}" is not numeric`);
+  if (typeof node[leaf] !== "number" && node[leaf] !== undefined)
+    throw new CalculationInputError(`Path "${path}" is not numeric`);
   node[leaf] = value;
   return clone as T;
 }
@@ -22,7 +24,12 @@ export interface SensitivityPoint {
   output: number | null;
 }
 
-export function sensitivity1D<T extends object>(base: T, path: string, values: readonly number[], evaluate: (input: T) => number | null): SensitivityPoint[] {
+export function sensitivity1D<T extends object>(
+  base: T,
+  path: string,
+  values: readonly number[],
+  evaluate: (input: T) => number | null,
+): SensitivityPoint[] {
   return values.map((v) => ({ input: v, output: evaluate(withValue(base, path, v)) }));
 }
 
@@ -43,7 +50,9 @@ export function sensitivity2D<T extends object>(
   colValues: readonly number[],
   evaluate: (input: T) => number | null,
 ): SensitivityGrid {
-  const outputs = rowValues.map((rv) => colValues.map((cv) => evaluate(withValue(withValue(base, rowPath, rv), colPath, cv))));
+  const outputs = rowValues.map((rv) =>
+    colValues.map((cv) => evaluate(withValue(withValue(base, rowPath, rv), colPath, cv))),
+  );
   return { rowPath, colPath, rows: [...rowValues], cols: [...colValues], outputs };
 }
 
@@ -65,13 +74,26 @@ export interface TornadoBar {
 }
 
 /** One-at-a-time sensitivity, sorted by absolute output swing (largest first). */
-export function tornado<T extends object>(base: T, variables: readonly TornadoVariable[], evaluate: (input: T) => number | null): TornadoBar[] {
+export function tornado<T extends object>(
+  base: T,
+  variables: readonly TornadoVariable[],
+  evaluate: (input: T) => number | null,
+): TornadoBar[] {
   return variables
     .map((v) => {
       const outputAtLow = evaluate(withValue(base, v.path, v.low));
       const outputAtHigh = evaluate(withValue(base, v.path, v.high));
-      const swing = outputAtLow === null || outputAtHigh === null ? 0 : Math.abs(outputAtHigh - outputAtLow);
-      return { path: v.path, label: v.label, low: v.low, high: v.high, outputAtLow, outputAtHigh, swing };
+      const swing =
+        outputAtLow === null || outputAtHigh === null ? 0 : Math.abs(outputAtHigh - outputAtLow);
+      return {
+        path: v.path,
+        label: v.label,
+        low: v.low,
+        high: v.high,
+        outputAtLow,
+        outputAtHigh,
+        swing,
+      };
     })
     .sort((a, b) => b.swing - a.swing);
 }

@@ -1,4 +1,9 @@
-import { CalculationInputError, requireNonNegative, requirePositiveInt, requireRate } from "./trace";
+import {
+  CalculationInputError,
+  requireNonNegative,
+  requirePositiveInt,
+  requireRate,
+} from "./trace";
 
 /**
  * Level monthly payment for a fully amortizing loan.
@@ -48,7 +53,11 @@ export interface AmortizationRow {
   balance: number;
 }
 
-export function amortizationSchedule(principal: number, annualRate: number, termMonths: number): AmortizationRow[] {
+export function amortizationSchedule(
+  principal: number,
+  annualRate: number,
+  termMonths: number,
+): AmortizationRow[] {
   const pmt = monthlyPayment(principal, annualRate, termMonths);
   const r = annualRate / 12;
   const rows: AmortizationRow[] = [];
@@ -58,7 +67,13 @@ export function amortizationSchedule(principal: number, annualRate: number, term
     let principalPaid = pmt - interest;
     if (period === termMonths) principalPaid = balance; // absorb floating-point residue in the final payment
     balance = balance - principalPaid;
-    rows.push({ period, payment: interest + principalPaid, interest, principal: principalPaid, balance: Math.abs(balance) < 1e-7 ? 0 : balance });
+    rows.push({
+      period,
+      payment: interest + principalPaid,
+      interest,
+      principal: principalPaid,
+      balance: Math.abs(balance) < 1e-7 ? 0 : balance,
+    });
   }
   return rows;
 }
@@ -73,7 +88,8 @@ export function interestPaidOver(
   requireNonNegative("months", months);
   if (opts.interestOnly) return interestOnlyPayment(principal, annualRate) * months;
   const term = opts.termMonths;
-  if (term === undefined) throw new CalculationInputError("termMonths is required for amortizing loans");
+  if (term === undefined)
+    throw new CalculationInputError("termMonths is required for amortizing loans");
   const wholeMonths = Math.min(Math.ceil(months), term);
   const schedule = amortizationSchedule(principal, annualRate, term);
   let interest = 0;

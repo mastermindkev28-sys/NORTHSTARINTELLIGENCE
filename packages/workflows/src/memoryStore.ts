@@ -1,5 +1,17 @@
 import { newId } from "@northstar/core";
-import type { ApprovalRequest, ApprovalStatus, AuditEntry, DeadLetter, DomainEvent, ExecutionLog, NewRun, RunStatus, StepRecord, WorkflowRun, WorkflowStore } from "./types";
+import type {
+  ApprovalRequest,
+  ApprovalStatus,
+  AuditEntry,
+  DeadLetter,
+  DomainEvent,
+  ExecutionLog,
+  NewRun,
+  RunStatus,
+  StepRecord,
+  WorkflowRun,
+  WorkflowStore,
+} from "./types";
 
 /** In-process store for tests, local development, and the demo workspace. Not durable. */
 export class InMemoryWorkflowStore implements WorkflowStore {
@@ -12,7 +24,9 @@ export class InMemoryWorkflowStore implements WorkflowStore {
   readonly audit: AuditEntry[] = [];
 
   async insertEvent(event: DomainEvent) {
-    const existing = [...this.events.values()].find((e) => e.organizationId === event.organizationId && e.idempotencyKey === event.idempotencyKey);
+    const existing = [...this.events.values()].find(
+      (e) => e.organizationId === event.organizationId && e.idempotencyKey === event.idempotencyKey,
+    );
     if (existing) return { event: existing, inserted: false };
     this.events.set(event.id, structuredClone(event));
     return { event, inserted: true };
@@ -24,17 +38,45 @@ export class InMemoryWorkflowStore implements WorkflowStore {
   }
 
   async createRun(r: NewRun) {
-    const existing = [...this.runs.values()].find((x) => x.workflowId === r.workflowId && x.eventId === r.eventId);
+    const existing = [...this.runs.values()].find(
+      (x) => x.workflowId === r.workflowId && x.eventId === r.eventId,
+    );
     if (existing) return { run: structuredClone(existing), inserted: false };
-    const run: WorkflowRun = { id: newId(), ...r, status: "queued", attempt: 0, lockedBy: null, lockedUntil: null, lastError: null, output: null, createdAt: r.nextRunAt, updatedAt: r.nextRunAt, finishedAt: null };
+    const run: WorkflowRun = {
+      id: newId(),
+      ...r,
+      status: "queued",
+      attempt: 0,
+      lockedBy: null,
+      lockedUntil: null,
+      lastError: null,
+      output: null,
+      createdAt: r.nextRunAt,
+      updatedAt: r.nextRunAt,
+      finishedAt: null,
+    };
     this.runs.set(run.id, run);
     return { run: structuredClone(run), inserted: true };
   }
 
-  async claimDueRuns({ now, limit, workerId, leaseMs }: { now: Date; limit: number; workerId: string; leaseMs: number }) {
+  async claimDueRuns({
+    now,
+    limit,
+    workerId,
+    leaseMs,
+  }: {
+    now: Date;
+    limit: number;
+    workerId: string;
+    leaseMs: number;
+  }) {
     const t = now.getTime();
     const due = [...this.runs.values()]
-      .filter((r) => ((r.status === "queued" || r.status === "sleeping") && Date.parse(r.nextRunAt) <= t) || (r.status === "running" && r.lockedUntil !== null && Date.parse(r.lockedUntil) < t))
+      .filter(
+        (r) =>
+          ((r.status === "queued" || r.status === "sleeping") && Date.parse(r.nextRunAt) <= t) ||
+          (r.status === "running" && r.lockedUntil !== null && Date.parse(r.lockedUntil) < t),
+      )
       .sort((a, b) => Date.parse(a.nextRunAt) - Date.parse(b.nextRunAt))
       .slice(0, limit);
     for (const r of due) {
@@ -51,7 +93,12 @@ export class InMemoryWorkflowStore implements WorkflowStore {
     return r && r.organizationId === organizationId ? structuredClone(r) : null;
   }
 
-  async updateRun(organizationId: string, runId: string, workerId: string | null, patch: Partial<WorkflowRun>) {
+  async updateRun(
+    organizationId: string,
+    runId: string,
+    workerId: string | null,
+    patch: Partial<WorkflowRun>,
+  ) {
     const r = this.runs.get(runId);
     if (!r || r.organizationId !== organizationId) return false;
     if (workerId !== null && r.lockedBy !== workerId) return false;
@@ -59,9 +106,17 @@ export class InMemoryWorkflowStore implements WorkflowStore {
     return true;
   }
 
-  async listRuns(organizationId: string, filter: { status?: RunStatus; workflowId?: string; limit?: number } = {}) {
+  async listRuns(
+    organizationId: string,
+    filter: { status?: RunStatus; workflowId?: string; limit?: number } = {},
+  ) {
     return [...this.runs.values()]
-      .filter((r) => r.organizationId === organizationId && (!filter.status || r.status === filter.status) && (!filter.workflowId || r.workflowId === filter.workflowId))
+      .filter(
+        (r) =>
+          r.organizationId === organizationId &&
+          (!filter.status || r.status === filter.status) &&
+          (!filter.workflowId || r.workflowId === filter.workflowId),
+      )
       .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
       .slice(0, filter.limit ?? 100)
       .map((r) => structuredClone(r));
@@ -82,18 +137,24 @@ export class InMemoryWorkflowStore implements WorkflowStore {
   }
 
   async listDeadLetters(organizationId: string) {
-    return this.deadLetters.filter((d) => d.organizationId === organizationId).map((d) => structuredClone(d));
+    return this.deadLetters
+      .filter((d) => d.organizationId === organizationId)
+      .map((d) => structuredClone(d));
   }
 
   async createApproval(a: ApprovalRequest) {
-    const existing = [...this.approvals.values()].find((x) => x.runId === a.runId && x.stepName === a.stepName);
+    const existing = [...this.approvals.values()].find(
+      (x) => x.runId === a.runId && x.stepName === a.stepName,
+    );
     if (existing) return structuredClone(existing);
     this.approvals.set(a.id, structuredClone(a));
     return a;
   }
 
   async getApprovalForStep(organizationId: string, runId: string, stepName: string) {
-    const a = [...this.approvals.values()].find((x) => x.organizationId === organizationId && x.runId === runId && x.stepName === stepName);
+    const a = [...this.approvals.values()].find(
+      (x) => x.organizationId === organizationId && x.runId === runId && x.stepName === stepName,
+    );
     return a ? structuredClone(a) : null;
   }
 
@@ -102,7 +163,11 @@ export class InMemoryWorkflowStore implements WorkflowStore {
     return a && a.organizationId === organizationId ? structuredClone(a) : null;
   }
 
-  async decideApproval(organizationId: string, approvalId: string, d: { status: "approved" | "rejected"; decidedBy: string; reason: string | null; at: string }) {
+  async decideApproval(
+    organizationId: string,
+    approvalId: string,
+    d: { status: "approved" | "rejected"; decidedBy: string; reason: string | null; at: string },
+  ) {
     const a = this.approvals.get(approvalId);
     if (!a || a.organizationId !== organizationId || a.status !== "pending") return null;
     a.status = d.status;
@@ -113,7 +178,9 @@ export class InMemoryWorkflowStore implements WorkflowStore {
   }
 
   async listApprovals(organizationId: string, status?: ApprovalStatus) {
-    return [...this.approvals.values()].filter((a) => a.organizationId === organizationId && (!status || a.status === status)).map((a) => structuredClone(a));
+    return [...this.approvals.values()]
+      .filter((a) => a.organizationId === organizationId && (!status || a.status === status))
+      .map((a) => structuredClone(a));
   }
 
   async appendLog(log: ExecutionLog) {

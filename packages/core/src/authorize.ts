@@ -3,9 +3,13 @@ import { can, type Permission, type TenantContext } from "./tenancy";
 
 export function authorize(ctx: TenantContext, permission: Permission): void {
   if (!can(ctx, permission)) {
-    throw new NorthstarError("FORBIDDEN", `Actor ${ctx.actor.type}:${ctx.actor.id} lacks permission ${permission}`, {
-      details: { permission, actor: ctx.actor, organizationId: ctx.organizationId },
-    });
+    throw new NorthstarError(
+      "FORBIDDEN",
+      `Actor ${ctx.actor.type}:${ctx.actor.id} lacks permission ${permission}`,
+      {
+        details: { permission, actor: ctx.actor, organizationId: ctx.organizationId },
+      },
+    );
   }
 }
 

@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { amortizationSchedule, annualizeReturn, interestPaidOver, irr, monthlyPayment, npv, remainingBalance } from "./finance";
+import {
+  amortizationSchedule,
+  annualizeReturn,
+  interestPaidOver,
+  irr,
+  monthlyPayment,
+  npv,
+  remainingBalance,
+} from "./finance";
 import { CalculationInputError } from "./trace";
 
 // Reference values computed independently (Python closed-form) — see docs/UNDERWRITING_METHODOLOGY.md §Verification.
@@ -39,7 +47,9 @@ describe("remainingBalance and schedule", () => {
     expect(totalPrincipal).toBeCloseTo(200_000, 6);
   });
   it("sums interest over a partial period", () => {
-    expect(interestPaidOver(200_000, 0.06, 12, { interestOnly: false, termMonths: 360 })).toBeCloseTo(11_933.1891791, 4);
+    expect(
+      interestPaidOver(200_000, 0.06, 12, { interestOnly: false, termMonths: 360 }),
+    ).toBeCloseTo(11_933.1891791, 4);
     expect(interestPaidOver(150_000, 0.12, 6, { interestOnly: true })).toBeCloseTo(9_000, 8);
     expect(() => interestPaidOver(1, 0.1, 1, { interestOnly: false })).toThrow(/termMonths/);
   });

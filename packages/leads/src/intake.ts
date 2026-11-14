@@ -1,7 +1,14 @@
 import { NorthstarError } from "@northstar/core";
 import { assessCompleteness, type CompletenessResult } from "./completeness";
 import { findDuplicates, type DuplicateResult, type LeadIdentity } from "./dedupe";
-import { normalizeAddress, normalizeEmail, normalizeName, normalizePhone, type NormalizedAddress, type NormalizedPhone } from "./normalize";
+import {
+  normalizeAddress,
+  normalizeEmail,
+  normalizeName,
+  normalizePhone,
+  type NormalizedAddress,
+  type NormalizedPhone,
+} from "./normalize";
 import { LeadInput, type ParsedLeadInput } from "./schema";
 import { scoreLead, type LeadScore, type ScoringContext } from "./scoring";
 
@@ -32,7 +39,9 @@ export interface IntakeOptions {
 export function processLeadIntake(raw: unknown, opts: IntakeOptions = {}): ProcessedLead {
   const parsed = LeadInput.safeParse(raw);
   if (!parsed.success) {
-    throw new NorthstarError("VALIDATION_FAILED", "Invalid lead payload", { details: { issues: parsed.error.issues } });
+    throw new NorthstarError("VALIDATION_FAILED", "Invalid lead payload", {
+      details: { issues: parsed.error.issues },
+    });
   }
   const input = parsed.data;
   const phones: NormalizedPhone[] = [];
@@ -51,7 +60,8 @@ export function processLeadIntake(raw: unknown, opts: IntakeOptions = {}): Proce
   const fullName = [firstName, lastName].filter(Boolean).join(" ") || null;
   const propertyAddress = input.propertyAddress ? normalizeAddress(input.propertyAddress) : null;
   const mailingAddress = input.mailingAddress ? normalizeAddress(input.mailingAddress) : null;
-  const absentee = propertyAddress && mailingAddress ? propertyAddress.key !== mailingAddress.key : null;
+  const absentee =
+    propertyAddress && mailingAddress ? propertyAddress.key !== mailingAddress.key : null;
 
   const identity: Omit<LeadIdentity, "id"> = {
     source: input.source,
@@ -70,5 +80,20 @@ export function processLeadIntake(raw: unknown, opts: IntakeOptions = {}): Proce
     hasValidEmail: !!email,
   });
   const completeness = assessCompleteness(input, { hasValidPhone: phones.length > 0 });
-  return { input, firstName, lastName, fullName, phones, invalidPhones, email, propertyAddress, mailingAddress, absentee, duplicates, score, completeness, identity };
+  return {
+    input,
+    firstName,
+    lastName,
+    fullName,
+    phones,
+    invalidPhones,
+    email,
+    propertyAddress,
+    mailingAddress,
+    absentee,
+    duplicates,
+    score,
+    completeness,
+    identity,
+  };
 }

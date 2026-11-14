@@ -84,7 +84,8 @@ const DAYS_PER_MONTH = 30.4375;
 export function monthsBetween(fromIso: string, toIso: string): number {
   const from = Date.parse(fromIso);
   const to = Date.parse(toIso);
-  if (Number.isNaN(from) || Number.isNaN(to)) throw new CalculationInputError(`Invalid date: ${fromIso} / ${toIso}`);
+  if (Number.isNaN(from) || Number.isNaN(to))
+    throw new CalculationInputError(`Invalid date: ${fromIso} / ${toIso}`);
   return (to - from) / (86_400_000 * DAYS_PER_MONTH);
 }
 
@@ -115,9 +116,14 @@ const roundHundred = (v: number) => Math.round(v / 100) * 100;
  *
  * Confidence is a transparent heuristic (see UNDERWRITING_METHODOLOGY.md §ARV) — not a statistical interval.
  */
-export function estimateArv(subject: ArvSubject, comps: readonly ComparableSale[], options: ArvOptions): ArvResult {
+export function estimateArv(
+  subject: ArvSubject,
+  comps: readonly ComparableSale[],
+  options: ArvOptions,
+): ArvResult {
   requireNonNegative("subject.livingAreaSqft", subject.livingAreaSqft);
-  if (subject.livingAreaSqft === 0) throw new CalculationInputError("subject.livingAreaSqft must be > 0");
+  if (subject.livingAreaSqft === 0)
+    throw new CalculationInputError("subject.livingAreaSqft must be > 0");
 
   const {
     asOf,
@@ -146,14 +152,21 @@ export function estimateArv(subject: ArvSubject, comps: readonly ComparableSale[
       continue;
     }
     if (monthsAgo > maxAgeMonths) {
-      excluded.push({ id: comp.id, reason: `Sold ${monthsAgo.toFixed(1)} months ago (limit ${maxAgeMonths})` });
+      excluded.push({
+        id: comp.id,
+        reason: `Sold ${monthsAgo.toFixed(1)} months ago (limit ${maxAgeMonths})`,
+      });
       continue;
     }
     if (comp.distanceMiles !== undefined && comp.distanceMiles > maxDistanceMiles) {
-      excluded.push({ id: comp.id, reason: `${comp.distanceMiles.toFixed(2)} mi away (limit ${maxDistanceMiles})` });
+      excluded.push({
+        id: comp.id,
+        reason: `${comp.distanceMiles.toFixed(2)} mi away (limit ${maxDistanceMiles})`,
+      });
       continue;
     }
-    const sizeDiff = Math.abs(comp.livingAreaSqft - subject.livingAreaSqft) / subject.livingAreaSqft;
+    const sizeDiff =
+      Math.abs(comp.livingAreaSqft - subject.livingAreaSqft) / subject.livingAreaSqft;
     if (sizeDiff > sqftTolerance) {
       excluded.push({
         id: comp.id,
@@ -161,13 +174,19 @@ export function estimateArv(subject: ArvSubject, comps: readonly ComparableSale[
       });
       continue;
     }
-    const adjustedPrice = comp.salePrice + (comp.adjustments ?? []).reduce((s, a) => s + a.amount, 0);
+    const adjustedPrice =
+      comp.salePrice + (comp.adjustments ?? []).reduce((s, a) => s + a.amount, 0);
     if (adjustedPrice <= 0) {
       excluded.push({ id: comp.id, reason: "Adjusted price is not positive" });
       continue;
     }
     distances.set(comp.id, comp.distanceMiles);
-    candidates.push({ id: comp.id, adjustedPrice, pricePerSqft: adjustedPrice / comp.livingAreaSqft, monthsAgo });
+    candidates.push({
+      id: comp.id,
+      adjustedPrice,
+      pricePerSqft: adjustedPrice / comp.livingAreaSqft,
+      monthsAgo,
+    });
   }
 
   if (trimOutliers && candidates.length >= 4) {
@@ -180,7 +199,10 @@ export function estimateArv(subject: ArvSubject, comps: readonly ComparableSale[
     const kept: typeof candidates = [];
     for (const c of candidates) {
       if (c.pricePerSqft < lo || c.pricePerSqft > hi) {
-        excluded.push({ id: c.id, reason: `Statistical outlier: $${c.pricePerSqft.toFixed(0)}/sqft outside [${lo.toFixed(0)}, ${hi.toFixed(0)}]` });
+        excluded.push({
+          id: c.id,
+          reason: `Statistical outlier: $${c.pricePerSqft.toFixed(0)}/sqft outside [${lo.toFixed(0)}, ${hi.toFixed(0)}]`,
+        });
       } else kept.push(c);
     }
     candidates = kept;
@@ -189,8 +211,19 @@ export function estimateArv(subject: ArvSubject, comps: readonly ComparableSale[
   if (candidates.length === 0) {
     warnings.push("No comparable sales met the selection criteria. ARV cannot be estimated.");
     return {
-      arv: null, low: null, high: null, medianArv: null, weightedPricePerSqft: null, medianPricePerSqft: null,
-      dispersion: null, confidence: 0, grade: "insufficient", included: [], excluded, warnings, trace,
+      arv: null,
+      low: null,
+      high: null,
+      medianArv: null,
+      weightedPricePerSqft: null,
+      medianPricePerSqft: null,
+      dispersion: null,
+      confidence: 0,
+      grade: "insufficient",
+      included: [],
+      excluded,
+      warnings,
+      trace,
     };
   }
 
@@ -211,37 +244,79 @@ export function estimateArv(subject: ArvSubject, comps: readonly ComparableSale[
   const weightedPpsf = included.reduce((s, c) => s + c.weight * c.pricePerSqft, 0);
   const medianPpsf = median(ppsfValues);
   const mean = ppsfValues.reduce((a, b) => a + b, 0) / ppsfValues.length;
-  const variance = ppsfValues.length > 1 ? ppsfValues.reduce((s, v) => s + (v - mean) ** 2, 0) / (ppsfValues.length - 1) : 0;
+  const variance =
+    ppsfValues.length > 1
+      ? ppsfValues.reduce((s, v) => s + (v - mean) ** 2, 0) / (ppsfValues.length - 1)
+      : 0;
   const dispersion = mean > 0 ? Math.sqrt(variance) / mean : 0;
 
   trace.record({
-    key: "weighted_ppsf", label: "Weighted adjusted price per sq ft", formula: "Σ(wᵢ · adjustedPriceᵢ / sqftᵢ)",
-    inputs: { comps: included.length, weighting }, result: weightedPpsf, unit: "usd_per_sqft",
+    key: "weighted_ppsf",
+    label: "Weighted adjusted price per sq ft",
+    formula: "Σ(wᵢ · adjustedPriceᵢ / sqftᵢ)",
+    inputs: { comps: included.length, weighting },
+    result: weightedPpsf,
+    unit: "usd_per_sqft",
   });
   const arvRaw = weightedPpsf * subject.livingAreaSqft;
   const arv = trace.record({
-    key: "arv", label: "After-repair value", formula: "Weighted $/sqft × subject sq ft (rounded to $100)",
-    inputs: { weightedPricePerSqft: weightedPpsf, subjectSqft: subject.livingAreaSqft }, result: roundHundred(arvRaw), unit: "usd",
+    key: "arv",
+    label: "After-repair value",
+    formula: "Weighted $/sqft × subject sq ft (rounded to $100)",
+    inputs: { weightedPricePerSqft: weightedPpsf, subjectSqft: subject.livingAreaSqft },
+    result: roundHundred(arvRaw),
+    unit: "usd",
   });
 
   // Transparent confidence heuristic.
   const n = included.length;
   const countScore = Math.min(n / 5, 1);
-  const dispersionScore = n < 2 ? 0.5 : dispersion <= 0.08 ? 1 : dispersion >= 0.3 ? 0.3 : 1 - ((dispersion - 0.08) / 0.22) * 0.7;
+  const dispersionScore =
+    n < 2
+      ? 0.5
+      : dispersion <= 0.08
+        ? 1
+        : dispersion >= 0.3
+          ? 0.3
+          : 1 - ((dispersion - 0.08) / 0.22) * 0.7;
   const avgMonths = included.reduce((s, c) => s + c.monthsAgo, 0) / n;
   const recencyScore = Math.max(0, 1 - avgMonths / (maxAgeMonths * 1.5));
-  const knownDistances = included.map((c) => distances.get(c.id)).filter((d): d is number => d !== undefined);
-  const distanceScore = knownDistances.length === 0 ? 0.5
-    : Math.max(0, 1 - knownDistances.reduce((a, b) => a + b, 0) / knownDistances.length / (maxDistanceMiles * 1.5));
-  let confidence = 0.4 * countScore + 0.35 * dispersionScore + 0.15 * recencyScore + 0.1 * distanceScore;
+  const knownDistances = included
+    .map((c) => distances.get(c.id))
+    .filter((d): d is number => d !== undefined);
+  const distanceScore =
+    knownDistances.length === 0
+      ? 0.5
+      : Math.max(
+          0,
+          1 -
+            knownDistances.reduce((a, b) => a + b, 0) /
+              knownDistances.length /
+              (maxDistanceMiles * 1.5),
+        );
+  let confidence =
+    0.4 * countScore + 0.35 * dispersionScore + 0.15 * recencyScore + 0.1 * distanceScore;
   if (n < minComps) {
     confidence = Math.min(confidence, 0.35);
     warnings.push(`Only ${n} comparable sale(s) qualified; at least ${minComps} are recommended.`);
   }
-  if (dispersion > 0.2) warnings.push(`High price dispersion among comps (CV ${(dispersion * 100).toFixed(0)}%). Review comp selection and adjustments.`);
-  if (knownDistances.length < n) warnings.push("Some comps have no distance information; distance weighting assumed the maximum radius.");
+  if (dispersion > 0.2)
+    warnings.push(
+      `High price dispersion among comps (CV ${(dispersion * 100).toFixed(0)}%). Review comp selection and adjustments.`,
+    );
+  if (knownDistances.length < n)
+    warnings.push(
+      "Some comps have no distance information; distance weighting assumed the maximum radius.",
+    );
   confidence = Math.round(confidence * 100) / 100;
-  const grade: ConfidenceGrade = n < minComps ? "insufficient" : confidence >= 0.75 ? "high" : confidence >= 0.55 ? "medium" : "low";
+  const grade: ConfidenceGrade =
+    n < minComps
+      ? "insufficient"
+      : confidence >= 0.75
+        ? "high"
+        : confidence >= 0.55
+          ? "medium"
+          : "low";
 
   const impliedValues = included.map((c) => c.impliedValue);
   return {

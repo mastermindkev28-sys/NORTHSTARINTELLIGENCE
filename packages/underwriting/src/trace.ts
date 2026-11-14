@@ -45,7 +45,9 @@ export function requireNonNegative(name: string, value: number): void {
 export function requireRate(name: string, value: number, { max = 1 }: { max?: number } = {}): void {
   requireFinite(name, value);
   if (value < 0 || value > max) {
-    throw new CalculationInputError(`${name} must be a decimal rate between 0 and ${max} (received ${value})`);
+    throw new CalculationInputError(
+      `${name} must be a decimal rate between 0 and ${max} (received ${value})`,
+    );
   }
 }
 

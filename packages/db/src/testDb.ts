@@ -14,7 +14,8 @@ export interface TestDatabase {
   close(): Promise<void>;
 }
 
-const ADMIN_URL = process.env.DATABASE_URL ?? "postgres://northstar:northstar@localhost:54329/northstar";
+const ADMIN_URL =
+  process.env.DATABASE_URL ?? "postgres://northstar:northstar@localhost:54329/northstar";
 const APP_TEST_PASSWORD = "northstar_app_test";
 
 export async function isDatabaseAvailable(): Promise<boolean> {
@@ -44,7 +45,10 @@ export async function createTestDatabase(): Promise<TestDatabase> {
     await migrate(c);
     // Test-only: allow the application role to log in. Production uses managed credentials.
     await c.query(`ALTER ROLE northstar_app LOGIN PASSWORD '${APP_TEST_PASSWORD}'`);
-    await c.query(`INSERT INTO organizations (id, name, slug, business_name) VALUES ($1, 'Alpha Acquisitions', 'alpha', 'Alpha Homes'), ($2, 'Beta Investments', 'beta', 'Beta Buys')`, [ORG_A, ORG_B]);
+    await c.query(
+      `INSERT INTO organizations (id, name, slug, business_name) VALUES ($1, 'Alpha Acquisitions', 'alpha', 'Alpha Homes'), ($2, 'Beta Investments', 'beta', 'Beta Buys')`,
+      [ORG_A, ORG_B],
+    );
   } finally {
     c.release();
   }

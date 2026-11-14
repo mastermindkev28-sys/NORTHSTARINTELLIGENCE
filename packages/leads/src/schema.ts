@@ -1,8 +1,19 @@
 import { z } from "zod";
 
 export const LeadSource = z.enum([
-  "web_form", "ppc", "seo", "direct_mail", "cold_call", "sms_campaign", "driving_for_dollars",
-  "referral", "list_import", "ppl_vendor", "crm_sync", "manual", "other",
+  "web_form",
+  "ppc",
+  "seo",
+  "direct_mail",
+  "cold_call",
+  "sms_campaign",
+  "driving_for_dollars",
+  "referral",
+  "list_import",
+  "ppl_vendor",
+  "crm_sync",
+  "manual",
+  "other",
 ]);
 export type LeadSource = z.infer<typeof LeadSource>;
 
@@ -11,12 +22,29 @@ export const AddressInput = z.object({
   line2: z.string().trim().optional(),
   city: z.string().trim().min(1),
   state: z.string().trim().length(2),
-  zip: z.string().trim().regex(/^\d{5}(-\d{4})?$/),
+  zip: z
+    .string()
+    .trim()
+    .regex(/^\d{5}(-\d{4})?$/),
 });
 export type AddressInput = z.infer<typeof AddressInput>;
 
-export const Timeline = z.enum(["asap", "within_30_days", "within_90_days", "within_6_months", "flexible", "unknown"]);
-export const Condition = z.enum(["turnkey", "light_repairs", "moderate_repairs", "major_repairs", "teardown", "unknown"]);
+export const Timeline = z.enum([
+  "asap",
+  "within_30_days",
+  "within_90_days",
+  "within_6_months",
+  "flexible",
+  "unknown",
+]);
+export const Condition = z.enum([
+  "turnkey",
+  "light_repairs",
+  "moderate_repairs",
+  "major_repairs",
+  "teardown",
+  "unknown",
+]);
 export const Occupancy = z.enum(["owner_occupied", "tenant_occupied", "vacant", "unknown"]);
 
 /** Raw inbound lead from any source (webhook, CSV, CRM sync, manual entry). Everything optional except source. */

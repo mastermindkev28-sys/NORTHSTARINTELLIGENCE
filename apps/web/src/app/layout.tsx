@@ -16,7 +16,13 @@ const NAV: { group: string; items: { href: string; label: string }[] }[] = [
   { group: "Command", items: [{ href: "/", label: "Executive" }] },
   { group: "Acquire", items: [{ href: "/leads", label: "Lead Intelligence" }] },
   { group: "Underwrite", items: [{ href: "/underwrite", label: "Deal Analyzer" }] },
-  { group: "Platform", items: [{ href: "/automation", label: "Automation Center" }, { href: "/agents", label: "Agents" }] },
+  {
+    group: "Platform",
+    items: [
+      { href: "/automation", label: "Automation Center" },
+      { href: "/agents", label: "Agents" },
+    ],
+  },
 ];
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -25,15 +31,24 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-screen">
         <div className="flex min-h-screen">
           <aside className="hidden w-60 shrink-0 border-r border-line bg-obsidian px-4 py-5 md:block">
-            <Link href="/" aria-label="Northstar Intelligence home"><Wordmark /></Link>
+            <Link href="/" aria-label="Northstar Intelligence home">
+              <Wordmark />
+            </Link>
             <nav className="mt-8 space-y-6" aria-label="Primary">
               {NAV.map((g) => (
                 <div key={g.group}>
-                  <div className="px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted/80">{g.group}</div>
+                  <div className="px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted/80">
+                    {g.group}
+                  </div>
                   <ul className="mt-2 space-y-0.5">
                     {g.items.map((i) => (
                       <li key={i.href}>
-                        <Link href={i.href} className="block rounded-md px-2 py-1.5 text-sm text-titanium/90 transition-colors hover:bg-graphite hover:text-arctic">{i.label}</Link>
+                        <Link
+                          href={i.href}
+                          className="block rounded-md px-2 py-1.5 text-sm text-titanium/90 transition-colors hover:bg-graphite hover:text-arctic"
+                        >
+                          {i.label}
+                        </Link>
                       </li>
                     ))}
                   </ul>
@@ -41,7 +56,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               ))}
             </nav>
             <div className="mt-10 rounded-md border border-caution/30 bg-caution/5 p-3 text-[11px] leading-relaxed text-caution/90">
-              Demo workspace. All people, properties, and market data are synthetic. Messages go to a sandbox, never to real phones.
+              Demo workspace. All people, properties, and market data are synthetic. Messages go to
+              a sandbox, never to real phones.
             </div>
           </aside>
           <div className="min-w-0 flex-1">

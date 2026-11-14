@@ -1,6 +1,14 @@
 import type { ParsedLeadInput } from "./schema";
 
-export type QualificationField = "property_address" | "phone" | "timeline" | "condition" | "occupancy" | "asking_price" | "motivation" | "seller_name";
+export type QualificationField =
+  | "property_address"
+  | "phone"
+  | "timeline"
+  | "condition"
+  | "occupancy"
+  | "asking_price"
+  | "motivation"
+  | "seller_name";
 
 export interface CompletenessResult {
   /** 0..1 share of qualification fields known. */
@@ -22,9 +30,21 @@ const QUESTIONS: Record<QualificationField, string> = {
   asking_price: "Do you have a price in mind that would work for you?",
 };
 
-const ORDER: QualificationField[] = ["property_address", "phone", "seller_name", "motivation", "timeline", "condition", "occupancy", "asking_price"];
+const ORDER: QualificationField[] = [
+  "property_address",
+  "phone",
+  "seller_name",
+  "motivation",
+  "timeline",
+  "condition",
+  "occupancy",
+  "asking_price",
+];
 
-export function assessCompleteness(lead: ParsedLeadInput, opts: { hasValidPhone: boolean }): CompletenessResult {
+export function assessCompleteness(
+  lead: ParsedLeadInput,
+  opts: { hasValidPhone: boolean },
+): CompletenessResult {
   const known: Record<QualificationField, boolean> = {
     property_address: !!lead.propertyAddress,
     phone: opts.hasValidPhone,

@@ -4,8 +4,16 @@ import { projectHold } from "./projection";
 import { sensitivity1D, sensitivity2D, tornado, withValue } from "./sensitivity";
 
 const base: RentalInputs = {
-  purchasePrice: 200_000, closingCosts: 4000, rehabCost: 10_000, monthlyRent: 2000, vacancyRate: 0.05,
-  annualPropertyTax: 3000, annualInsurance: 1200, managementRate: 0.08, maintenanceRate: 0.05, capexRate: 0.05,
+  purchasePrice: 200_000,
+  closingCosts: 4000,
+  rehabCost: 10_000,
+  monthlyRent: 2000,
+  vacancyRate: 0.05,
+  annualPropertyTax: 3000,
+  annualInsurance: 1200,
+  managementRate: 0.08,
+  maintenanceRate: 0.05,
+  capexRate: 0.05,
   financing: { downPaymentRate: 0.25, annualRate: 0.07, termMonths: 360 },
 };
 
@@ -44,20 +52,32 @@ describe("analyzeRental", () => {
   });
 
   it("interest-only financing", () => {
-    const r = analyzeRental({ ...base, financing: { loanAmount: 150_000, annualRate: 0.08, termMonths: 360, interestOnly: true } });
+    const r = analyzeRental({
+      ...base,
+      financing: { loanAmount: 150_000, annualRate: 0.08, termMonths: 360, interestOnly: true },
+    });
     expect(r.annualDebtService).toBeCloseTo(12_000, 8);
   });
 
   it("validates inputs", () => {
     expect(() => analyzeRental({ ...base, vacancyRate: 5 })).toThrow();
     expect(() => analyzeRental({ ...base, purchasePrice: 0 })).toThrow();
-    expect(() => analyzeRental({ ...base, financing: { annualRate: 0.07, termMonths: 360 } })).toThrow(/loanAmount or downPaymentRate/);
+    expect(() =>
+      analyzeRental({ ...base, financing: { annualRate: 0.07, termMonths: 360 } }),
+    ).toThrow(/loanAmount or downPaymentRate/);
   });
 });
 
 describe("projectHold", () => {
   it("year 1 equals the stabilized analysis and IRR reconciles with cash flows", () => {
-    const p = projectHold({ rental: base, years: 5, annualRentGrowth: 0.03, annualExpenseGrowth: 0.03, annualAppreciation: 0.03, saleCostRate: 0.06 });
+    const p = projectHold({
+      rental: base,
+      years: 5,
+      annualRentGrowth: 0.03,
+      annualExpenseGrowth: 0.03,
+      annualAppreciation: 0.03,
+      saleCostRate: 0.06,
+    });
     const y1 = analyzeRental(base);
     expect(p.years[0]?.netOperatingIncome).toBeCloseTo(y1.netOperatingIncome, 8);
     expect(p.years[0]?.cashFlow).toBeCloseTo(y1.annualCashFlow, 8);
@@ -71,7 +91,16 @@ describe("projectHold", () => {
     expect(p.totalProfit).toBeCloseTo(p.totalCashFlow + p.saleProceeds - 64_000, 6);
   });
   it("rejects invalid horizons", () => {
-    expect(() => projectHold({ rental: base, years: 0, annualRentGrowth: 0, annualExpenseGrowth: 0, annualAppreciation: 0, saleCostRate: 0 })).toThrow();
+    expect(() =>
+      projectHold({
+        rental: base,
+        years: 0,
+        annualRentGrowth: 0,
+        annualExpenseGrowth: 0,
+        annualAppreciation: 0,
+        saleCostRate: 0,
+      }),
+    ).toThrow();
   });
 });
 
@@ -90,15 +119,26 @@ describe("sensitivity", () => {
     expect(pts[1]!.output!).toBeCloseTo(analyzeRental(base).cashOnCash as number, 12);
   });
   it("2D grid shape", () => {
-    const g = sensitivity2D(base, "monthlyRent", [1900, 2100], "financing.annualRate", [0.06, 0.07, 0.08], coc);
+    const g = sensitivity2D(
+      base,
+      "monthlyRent",
+      [1900, 2100],
+      "financing.annualRate",
+      [0.06, 0.07, 0.08],
+      coc,
+    );
     expect(g.outputs).toHaveLength(2);
     expect(g.outputs[0]).toHaveLength(3);
   });
   it("tornado sorts by swing", () => {
-    const bars = tornado(base, [
-      { path: "annualInsurance", label: "Insurance", low: 1000, high: 1400 },
-      { path: "monthlyRent", label: "Rent", low: 1800, high: 2200 },
-    ], coc);
+    const bars = tornado(
+      base,
+      [
+        { path: "annualInsurance", label: "Insurance", low: 1000, high: 1400 },
+        { path: "monthlyRent", label: "Rent", low: 1800, high: 2200 },
+      ],
+      coc,
+    );
     expect(bars[0]?.label).toBe("Rent");
     expect(bars[0]!.swing).toBeGreaterThan(bars[1]!.swing);
   });

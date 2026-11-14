@@ -1,6 +1,7 @@
 import type { Sourced } from "@northstar/core";
 
-export type ProviderCapability = "property_details" | "comparable_sales" | "valuation" | "rent_estimate";
+export type ProviderCapability =
+  "property_details" | "comparable_sales" | "valuation" | "rent_estimate";
 
 export interface AddressQuery {
   line1: string;
@@ -82,9 +83,15 @@ export interface PropertyDataProvider {
   readonly capabilities: ReadonlySet<ProviderCapability>;
   readonly isDemo: boolean;
   getPropertyDetails?(address: AddressQuery): Promise<ProviderResult<PropertyDetails> | null>;
-  getComparableSales?(address: AddressQuery, criteria: CompsCriteria): Promise<ProviderResult<ComparableRecord[]>>;
+  getComparableSales?(
+    address: AddressQuery,
+    criteria: CompsCriteria,
+  ): Promise<ProviderResult<ComparableRecord[]>>;
   getValuation?(address: AddressQuery): Promise<ProviderResult<ValuationEstimate> | null>;
   getRentEstimate?(address: AddressQuery): Promise<ProviderResult<RentEstimate> | null>;
 }
 
-export type FetchLike = (url: string, init: { method: string; headers: Record<string, string>; signal?: AbortSignal }) => Promise<{ status: number; ok: boolean; json(): Promise<unknown>; text(): Promise<string> }>;
+export type FetchLike = (
+  url: string,
+  init: { method: string; headers: Record<string, string>; signal?: AbortSignal },
+) => Promise<{ status: number; ok: boolean; json(): Promise<unknown>; text(): Promise<string> }>;

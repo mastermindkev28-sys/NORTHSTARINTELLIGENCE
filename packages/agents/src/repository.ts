@@ -4,7 +4,19 @@ import type { LeadIdentity } from "@northstar/leads";
 import type { ComparableRecord } from "@northstar/providers";
 import type { WholesaleDealResult } from "@northstar/underwriting";
 
-export type LeadStatus = "new" | "contacting" | "qualifying" | "qualified" | "appointment_set" | "offer_pending" | "under_contract" | "closed_won" | "closed_lost" | "nurture" | "dead" | "duplicate";
+export type LeadStatus =
+  | "new"
+  | "contacting"
+  | "qualifying"
+  | "qualified"
+  | "appointment_set"
+  | "offer_pending"
+  | "under_contract"
+  | "closed_won"
+  | "closed_lost"
+  | "nurture"
+  | "dead"
+  | "duplicate";
 
 export interface LeadRecord {
   id: string;
@@ -18,7 +30,14 @@ export interface LeadRecord {
   phones: string[];
   email: string | null;
   numberSource: "consumer_provided" | "skip_trace" | "purchased_list" | "unknown";
-  property: { line1: string; unit: string | null; city: string; state: string; zip5: string; key: string } | null;
+  property: {
+    line1: string;
+    unit: string | null;
+    city: string;
+    state: string;
+    zip5: string;
+    key: string;
+  } | null;
   mailingState: string | null;
   score: number;
   tier: string;
@@ -61,7 +80,13 @@ export interface TaskRecord {
   leadId: string | null;
   title: string;
   detail: string;
-  kind: "review_message" | "escalation" | "book_appointment" | "duplicate_review" | "compliance_review" | "follow_up";
+  kind:
+    | "review_message"
+    | "escalation"
+    | "book_appointment"
+    | "duplicate_review"
+    | "compliance_review"
+    | "follow_up";
   status: "open" | "done";
   createdAt: string;
 }
@@ -102,7 +127,12 @@ export interface DomainRepository {
   listMessages(orgId: string, leadId: string): Promise<MessageRecord[]>;
   createTask(task: TaskRecord): Promise<void>;
   listTasks(orgId: string): Promise<TaskRecord[]>;
-  recordUsage(orgId: string, metric: string, quantity: number, idempotencyKey: string): Promise<void>;
+  recordUsage(
+    orgId: string,
+    metric: string,
+    quantity: number,
+    idempotencyKey: string,
+  ): Promise<void>;
 }
 
 export class InMemoryDomainRepository implements DomainRepository {
@@ -116,7 +146,17 @@ export class InMemoryDomainRepository implements DomainRepository {
   readonly settings = new Map<string, OrgSettings>();
 
   async getSettings(orgId: string): Promise<OrgSettings> {
-    return this.settings.get(orgId) ?? { businessName: "Your Company", underwriting: { arvFactor: 0.7, targetAssignmentFee: 10_000, holdMonths: 6, endBuyerProfitRate: 0.15 } };
+    return (
+      this.settings.get(orgId) ?? {
+        businessName: "Your Company",
+        underwriting: {
+          arvFactor: 0.7,
+          targetAssignmentFee: 10_000,
+          holdMonths: 6,
+          endBuyerProfitRate: 0.15,
+        },
+      }
+    );
   }
   async insertLead(lead: LeadRecord) {
     this.leads.set(lead.id, structuredClone(lead));
@@ -132,10 +172,21 @@ export class InMemoryDomainRepository implements DomainRepository {
     return structuredClone(l);
   }
   async listLeads(orgId: string) {
-    return [...this.leads.values()].filter((l) => l.organizationId === orgId).map((l) => structuredClone(l));
+    return [...this.leads.values()]
+      .filter((l) => l.organizationId === orgId)
+      .map((l) => structuredClone(l));
   }
   async listLeadIdentities(orgId: string): Promise<LeadIdentity[]> {
-    return (await this.listLeads(orgId)).map((l) => ({ id: l.id, source: l.source, externalId: l.externalId, phonesE164: l.phones, email: l.email, addressKey: l.property?.key ?? null, zip5: l.property?.zip5 ?? null, fullName: l.fullName }));
+    return (await this.listLeads(orgId)).map((l) => ({
+      id: l.id,
+      source: l.source,
+      externalId: l.externalId,
+      phonesE164: l.phones,
+      email: l.email,
+      addressKey: l.property?.key ?? null,
+      zip5: l.property?.zip5 ?? null,
+      fullName: l.fullName,
+    }));
   }
   private k(orgId: string, v: string) {
     return `${orgId}:${v}`;
@@ -149,7 +200,8 @@ export class InMemoryDomainRepository implements DomainRepository {
     return structuredClone(this.consents.get(this.k(orgId, phone)) ?? []);
   }
   async revokeConsents(orgId: string, phone: string, at: string, source: string) {
-    for (const c of this.consents.get(this.k(orgId, phone)) ?? []) if (!c.revokedAt) Object.assign(c, { revokedAt: at, revocationSource: source });
+    for (const c of this.consents.get(this.k(orgId, phone)) ?? [])
+      if (!c.revokedAt) Object.assign(c, { revokedAt: at, revocationSource: source });
   }
   async suppress(orgId: string, value: string, reason: string, source: string) {
     this.suppressions.set(this.k(orgId, value), { reason, source });
@@ -164,7 +216,9 @@ export class InMemoryDomainRepository implements DomainRepository {
     this.messages.push(structuredClone(msg));
   }
   async listMessages(orgId: string, leadId: string) {
-    return this.messages.filter((m) => m.organizationId === orgId && m.leadId === leadId).map((m) => structuredClone(m));
+    return this.messages
+      .filter((m) => m.organizationId === orgId && m.leadId === leadId)
+      .map((m) => structuredClone(m));
   }
   async createTask(task: TaskRecord) {
     this.tasks.push(structuredClone(task));
@@ -173,6 +227,7 @@ export class InMemoryDomainRepository implements DomainRepository {
     return this.tasks.filter((t) => t.organizationId === orgId).map((t) => structuredClone(t));
   }
   async recordUsage(orgId: string, metric: string, quantity: number, idempotencyKey: string) {
-    if (!this.usage.has(idempotencyKey)) this.usage.set(idempotencyKey, { orgId, metric, quantity });
+    if (!this.usage.has(idempotencyKey))
+      this.usage.set(idempotencyKey, { orgId, metric, quantity });
   }
 }

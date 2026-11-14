@@ -55,14 +55,18 @@ describe("authorization", () => {
   });
   it("reports cross-tenant access as not found", () => {
     const ctx = contextForRole(org, { type: "user", id: "u1" }, "owner");
-    expect(() => assertSameTenant(ctx, "22222222-2222-2222-2222-222222222222")).toThrow(/not found/i);
+    expect(() => assertSameTenant(ctx, "22222222-2222-2222-2222-222222222222")).toThrow(
+      /not found/i,
+    );
   });
 });
 
 describe("errors", () => {
   it("classifies retryability", () => {
     expect(isRetryable(new NorthstarError("VALIDATION_FAILED", "bad"))).toBe(false);
-    expect(isRetryable(new NorthstarError("PROVIDER_UNAVAILABLE", "down", { retryable: true }))).toBe(true);
+    expect(
+      isRetryable(new NorthstarError("PROVIDER_UNAVAILABLE", "down", { retryable: true })),
+    ).toBe(true);
     expect(isRetryable(new Error("socket hang up"))).toBe(true);
   });
 });

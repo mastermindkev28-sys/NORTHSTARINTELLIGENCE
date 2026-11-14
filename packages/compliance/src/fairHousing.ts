@@ -11,14 +11,43 @@ export interface FairHousingFinding {
 }
 
 const PATTERNS: { category: string; pattern: RegExp }[] = [
-  { category: "familial_status", pattern: /\b(no (kids|children)|adults? only|perfect for (singles|couples|empty nesters)|not suitable for (kids|children))\b/i },
-  { category: "religion", pattern: /\b(christian|jewish|muslim|catholic|church[- ]goers?)\s+(neighborhoods?|communit(?:y|ies)|buyers?|family|families|areas?)\b/i },
-  { category: "race_color_national_origin", pattern: /\b(white|black|hispanic|latino|asian|african|mexican|immigrants?)\s+(neighborhoods?|areas?|communit(?:y|ies)|buyers?|families|tenants?)\b/i },
-  { category: "national_origin", pattern: /\b(english[- ]speaking only|must speak english|no (immigrants|foreigners))\b/i },
-  { category: "disability", pattern: /\b(no wheelchairs?|able[- ]bodied (only|tenants|buyers)|not for (handicapped|disabled))\b/i },
-  { category: "sex", pattern: /\b(men only|women only|male tenants? only|female tenants? only)\b/i },
-  { category: "steering", pattern: /\b(exclusive|safe|good|bad|changing|transitional) (neighborhoods?|areas?|communit(?:y|ies)) for\b/i },
-  { category: "source_of_income", pattern: /\b(no section ?8|no vouchers|no (housing )?assistance)\b/i },
+  {
+    category: "familial_status",
+    pattern:
+      /\b(no (kids|children)|adults? only|perfect for (singles|couples|empty nesters)|not suitable for (kids|children))\b/i,
+  },
+  {
+    category: "religion",
+    pattern:
+      /\b(christian|jewish|muslim|catholic|church[- ]goers?)\s+(neighborhoods?|communit(?:y|ies)|buyers?|family|families|areas?)\b/i,
+  },
+  {
+    category: "race_color_national_origin",
+    pattern:
+      /\b(white|black|hispanic|latino|asian|african|mexican|immigrants?)\s+(neighborhoods?|areas?|communit(?:y|ies)|buyers?|families|tenants?)\b/i,
+  },
+  {
+    category: "national_origin",
+    pattern: /\b(english[- ]speaking only|must speak english|no (immigrants|foreigners))\b/i,
+  },
+  {
+    category: "disability",
+    pattern:
+      /\b(no wheelchairs?|able[- ]bodied (only|tenants|buyers)|not for (handicapped|disabled))\b/i,
+  },
+  {
+    category: "sex",
+    pattern: /\b(men only|women only|male tenants? only|female tenants? only)\b/i,
+  },
+  {
+    category: "steering",
+    pattern:
+      /\b(exclusive|safe|good|bad|changing|transitional) (neighborhoods?|areas?|communit(?:y|ies)) for\b/i,
+  },
+  {
+    category: "source_of_income",
+    pattern: /\b(no section ?8|no vouchers|no (housing )?assistance)\b/i,
+  },
 ];
 
 export function screenFairHousing(text: string): FairHousingFinding[] {
@@ -32,8 +61,23 @@ export function screenFairHousing(text: string): FairHousingFinding[] {
 
 /** Attributes that may never be used for lead targeting, scoring, or segmentation. */
 export const PROHIBITED_TARGETING_ATTRIBUTES = [
-  "race", "color", "religion", "sex", "gender", "gender_identity", "sexual_orientation", "familial_status", "children",
-  "national_origin", "ethnicity", "language", "disability", "age", "marital_status", "source_of_income", "surname_origin",
+  "race",
+  "color",
+  "religion",
+  "sex",
+  "gender",
+  "gender_identity",
+  "sexual_orientation",
+  "familial_status",
+  "children",
+  "national_origin",
+  "ethnicity",
+  "language",
+  "disability",
+  "age",
+  "marital_status",
+  "source_of_income",
+  "surname_origin",
   "neighborhood_demographics",
 ] as const;
 

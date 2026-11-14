@@ -2,7 +2,8 @@ export type LogLevel = "debug" | "info" | "warn" | "error";
 const LEVEL_ORDER: Record<LogLevel, number> = { debug: 10, info: 20, warn: 30, error: 40 };
 
 /** Keys whose values are always redacted from logs (PII and secrets). */
-const REDACT_KEYS = /^(password|secret|token|api[_-]?key|authorization|cookie|ssn|phone|email|dob)$/i;
+const REDACT_KEYS =
+  /^(password|secret|token|api[_-]?key|authorization|cookie|ssn|phone|email|dob)$/i;
 
 export interface Logger {
   debug(msg: string, fields?: Record<string, unknown>): void;
@@ -27,11 +28,18 @@ export function createLogger(
   base: Record<string, unknown> = {},
   opts: { level?: LogLevel; sink?: (line: string) => void } = {},
 ): Logger {
-  const min = LEVEL_ORDER[opts.level ?? ((process.env.LOG_LEVEL as LogLevel | undefined) ?? "info")];
+  const min = LEVEL_ORDER[opts.level ?? (process.env.LOG_LEVEL as LogLevel | undefined) ?? "info"];
   const sink = opts.sink ?? ((line: string) => process.stdout.write(line + "\n"));
   const emit = (level: LogLevel, msg: string, fields?: Record<string, unknown>) => {
     if (LEVEL_ORDER[level] < min) return;
-    sink(JSON.stringify({ ts: new Date().toISOString(), level, msg, ...(redact({ ...base, ...fields }) as object) }));
+    sink(
+      JSON.stringify({
+        ts: new Date().toISOString(),
+        level,
+        msg,
+        ...(redact({ ...base, ...fields }) as object),
+      }),
+    );
   };
   return {
     debug: (m, f) => emit("debug", m, f),

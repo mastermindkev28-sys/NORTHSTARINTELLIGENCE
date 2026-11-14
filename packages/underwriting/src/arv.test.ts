@@ -2,13 +2,29 @@ import { describe, expect, it } from "vitest";
 import { estimateArv, type ComparableSale } from "./arv";
 
 const asOf = "2026-11-01";
-const comp = (id: string, salePrice: number, sqft: number, saleDate: string, distanceMiles = 0.3, adjustments?: ComparableSale["adjustments"]): ComparableSale => ({
-  id, salePrice, livingAreaSqft: sqft, saleDate, distanceMiles, adjustments,
+const comp = (
+  id: string,
+  salePrice: number,
+  sqft: number,
+  saleDate: string,
+  distanceMiles = 0.3,
+  adjustments?: ComparableSale["adjustments"],
+): ComparableSale => ({
+  id,
+  salePrice,
+  livingAreaSqft: sqft,
+  saleDate,
+  distanceMiles,
+  adjustments,
 });
 
 describe("estimateArv", () => {
   it("computes equal-weighted price per sqft exactly", () => {
-    const comps = [comp("a", 300_000, 1500, "2026-09-01"), comp("b", 320_000, 1600, "2026-08-15"), comp("c", 290_000, 1450, "2026-10-01")];
+    const comps = [
+      comp("a", 300_000, 1500, "2026-09-01"),
+      comp("b", 320_000, 1600, "2026-08-15"),
+      comp("c", 290_000, 1450, "2026-10-01"),
+    ];
     // each comp is exactly $200/sqft
     const r = estimateArv({ livingAreaSqft: 1500 }, comps, { asOf, weighting: "equal" });
     expect(r.weightedPricePerSqft).toBeCloseTo(200, 9);
@@ -20,7 +36,9 @@ describe("estimateArv", () => {
 
   it("applies explicit adjustments", () => {
     const comps = [
-      comp("a", 280_000, 1400, "2026-09-01", 0.2, [{ label: "No garage vs subject garage", amount: 10_000 }]),
+      comp("a", 280_000, 1400, "2026-09-01", 0.2, [
+        { label: "No garage vs subject garage", amount: 10_000 },
+      ]),
       comp("b", 290_000, 1450, "2026-09-01", 0.2),
       comp("c", 300_000, 1500, "2026-09-01", 0.2),
     ];
@@ -66,9 +84,21 @@ describe("estimateArv", () => {
   });
 
   it("weights closer and more recent comps more heavily", () => {
-    const comps = [comp("near-new", 330_000, 1500, "2026-10-15", 0.1), comp("far-old", 270_000, 1500, "2026-06-01", 0.9), comp("mid", 300_000, 1500, "2026-08-01", 0.5)];
-    const equal = estimateArv({ livingAreaSqft: 1500 }, comps, { asOf, weighting: "equal", trimOutliers: false });
-    const weighted = estimateArv({ livingAreaSqft: 1500 }, comps, { asOf, weighting: "recency_distance", trimOutliers: false });
+    const comps = [
+      comp("near-new", 330_000, 1500, "2026-10-15", 0.1),
+      comp("far-old", 270_000, 1500, "2026-06-01", 0.9),
+      comp("mid", 300_000, 1500, "2026-08-01", 0.5),
+    ];
+    const equal = estimateArv({ livingAreaSqft: 1500 }, comps, {
+      asOf,
+      weighting: "equal",
+      trimOutliers: false,
+    });
+    const weighted = estimateArv({ livingAreaSqft: 1500 }, comps, {
+      asOf,
+      weighting: "recency_distance",
+      trimOutliers: false,
+    });
     expect(weighted.arv as number).toBeGreaterThan(equal.arv as number);
     const weightSum = weighted.included.reduce((s, c) => s + c.weight, 0);
     expect(weightSum).toBeCloseTo(1, 12);
@@ -82,14 +112,22 @@ describe("estimateArv", () => {
   });
 
   it("flags high dispersion", () => {
-    const comps = [comp("a", 240_000, 1500, "2026-10-01"), comp("b", 360_000, 1500, "2026-10-01"), comp("c", 300_000, 1500, "2026-10-01")];
+    const comps = [
+      comp("a", 240_000, 1500, "2026-10-01"),
+      comp("b", 360_000, 1500, "2026-10-01"),
+      comp("c", 300_000, 1500, "2026-10-01"),
+    ];
     const r = estimateArv({ livingAreaSqft: 1500 }, comps, { asOf, trimOutliers: false });
     expect(r.dispersion as number).toBeCloseTo(0.2, 6);
     expect(r.grade).not.toBe("high");
   });
 
   it("is deterministic", () => {
-    const comps = [comp("a", 300_000, 1500, "2026-09-01"), comp("b", 320_000, 1550, "2026-08-15", 0.6), comp("c", 290_000, 1450, "2026-10-01", 0.4)];
+    const comps = [
+      comp("a", 300_000, 1500, "2026-09-01"),
+      comp("b", 320_000, 1550, "2026-08-15", 0.6),
+      comp("c", 290_000, 1450, "2026-10-01", 0.4),
+    ];
     const r1 = estimateArv({ livingAreaSqft: 1500 }, comps, { asOf });
     const r2 = estimateArv({ livingAreaSqft: 1500 }, comps, { asOf });
     expect(r1.arv).toBe(r2.arv);

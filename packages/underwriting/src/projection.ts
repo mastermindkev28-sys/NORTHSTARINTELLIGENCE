@@ -1,5 +1,11 @@
 import { irr, remainingBalance } from "./finance";
-import { annualDebtServiceFor, computeOperatingExpenses, resolveLoanAmount, validateRentalInputs, type RentalInputs } from "./rental";
+import {
+  annualDebtServiceFor,
+  computeOperatingExpenses,
+  resolveLoanAmount,
+  validateRentalInputs,
+  type RentalInputs,
+} from "./rental";
 import { CalculationInputError, requireRate } from "./trace";
 
 export interface ProjectionInputs {
@@ -40,7 +46,8 @@ export interface ProjectionResult {
 export function projectHold(p: ProjectionInputs): ProjectionResult {
   const r = p.rental;
   validateRentalInputs(r);
-  if (!Number.isInteger(p.years) || p.years < 1 || p.years > 40) throw new CalculationInputError("years must be an integer 1–40");
+  if (!Number.isInteger(p.years) || p.years < 1 || p.years > 40)
+    throw new CalculationInputError("years must be an integer 1–40");
   requireRate("annualRentGrowth", Math.abs(p.annualRentGrowth), { max: 0.5 });
   requireRate("annualExpenseGrowth", Math.abs(p.annualExpenseGrowth), { max: 0.5 });
   requireRate("annualAppreciation", Math.abs(p.annualAppreciation), { max: 0.5 });
@@ -48,8 +55,11 @@ export function projectHold(p: ProjectionInputs): ProjectionResult {
 
   const loanAmount = resolveLoanAmount(r.purchasePrice, r.financing);
   const debtService = r.financing ? annualDebtServiceFor(loanAmount, r.financing) : 0;
-  const financingFees = r.financing ? loanAmount * (r.financing.points ?? 0) + (r.financing.lenderFees ?? 0) : 0;
-  const initialCash = r.purchasePrice - loanAmount + (r.closingCosts ?? 0) + (r.rehabCost ?? 0) + financingFees;
+  const financingFees = r.financing
+    ? loanAmount * (r.financing.points ?? 0) + (r.financing.lenderFees ?? 0)
+    : 0;
+  const initialCash =
+    r.purchasePrice - loanAmount + (r.closingCosts ?? 0) + (r.rehabCost ?? 0) + financingFees;
   const startValue = r.marketValue ?? r.purchasePrice + (r.rehabCost ?? 0);
 
   const rows: ProjectionYear[] = [];
@@ -73,10 +83,29 @@ export function projectHold(p: ProjectionInputs): ProjectionResult {
     const noi = egi - opex;
     const cashFlow = noi - debtService;
     const propertyValue = startValue * (1 + p.annualAppreciation) ** year;
-    const loanBalance = !r.financing || loanAmount === 0 ? 0
-      : r.financing.interestOnly ? loanAmount
-      : remainingBalance(loanAmount, r.financing.annualRate, r.financing.termMonths, Math.min(year * 12, r.financing.termMonths));
-    rows.push({ year, grossScheduledIncome: gsi, effectiveGrossIncome: egi, operatingExpenses: opex, netOperatingIncome: noi, debtService, cashFlow, propertyValue, loanBalance, equity: propertyValue - loanBalance });
+    const loanBalance =
+      !r.financing || loanAmount === 0
+        ? 0
+        : r.financing.interestOnly
+          ? loanAmount
+          : remainingBalance(
+              loanAmount,
+              r.financing.annualRate,
+              r.financing.termMonths,
+              Math.min(year * 12, r.financing.termMonths),
+            );
+    rows.push({
+      year,
+      grossScheduledIncome: gsi,
+      effectiveGrossIncome: egi,
+      operatingExpenses: opex,
+      netOperatingIncome: noi,
+      debtService,
+      cashFlow,
+      propertyValue,
+      loanBalance,
+      equity: propertyValue - loanBalance,
+    });
     cashFlows.push(cashFlow);
   }
   const last = rows[rows.length - 1] as ProjectionYear;

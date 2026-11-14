@@ -55,7 +55,14 @@ export function estimateRehab(i: RehabInputs, trace = new Trace()): RehabEstimat
       return { category: li.category, amount: li.quantity * li.unitCost };
     });
     base = lines.reduce((s, l) => s + l.amount, 0);
-    trace.record({ key: "rehab_base", label: "Rehab base (line items)", formula: "Σ quantity × unit cost", inputs: { lineItems: lines.length }, result: base, unit: "usd" });
+    trace.record({
+      key: "rehab_base",
+      label: "Rehab base (line items)",
+      formula: "Σ quantity × unit cost",
+      inputs: { lineItems: lines.length },
+      result: base,
+      unit: "usd",
+    });
   } else {
     if (!i.scope) throw new CalculationInputError("Provide either lineItems or a rehab scope");
     requireNonNegative("livingAreaSqft", i.livingAreaSqft);
@@ -65,9 +72,23 @@ export function estimateRehab(i: RehabInputs, trace = new Trace()): RehabEstimat
     const rate = custom ?? DEFAULT_REHAB_COST_PER_SQFT[i.scope];
     base = rate * i.livingAreaSqft;
     lines = [{ category: `${i.scope} rehab @ $${rate}/sqft`, amount: base }];
-    trace.record({ key: "rehab_base", label: "Rehab base ($/sqft)", formula: "scope $/sqft × living area", inputs: { scope: i.scope, rate, sqft: i.livingAreaSqft }, result: base, unit: "usd" });
+    trace.record({
+      key: "rehab_base",
+      label: "Rehab base ($/sqft)",
+      formula: "scope $/sqft × living area",
+      inputs: { scope: i.scope, rate, sqft: i.livingAreaSqft },
+      result: base,
+      unit: "usd",
+    });
   }
   const contingency = base * contingencyRate;
-  const total = trace.record({ key: "rehab_total", label: "Rehab estimate incl. contingency", formula: "base × (1 + contingency rate)", inputs: { base, contingencyRate }, result: base + contingency, unit: "usd" });
+  const total = trace.record({
+    key: "rehab_total",
+    label: "Rehab estimate incl. contingency",
+    formula: "base × (1 + contingency rate)",
+    inputs: { base, contingencyRate },
+    result: base + contingency,
+    unit: "usd",
+  });
   return { method, base, contingency, total, lines, isPlaceholderRate };
 }

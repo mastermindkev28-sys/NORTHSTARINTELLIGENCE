@@ -25,7 +25,8 @@ export function jaroWinkler(a: string, b: string): number {
     if (a[i] !== b[k]) transpositions++;
     k++;
   }
-  const jaro = (matches / a.length + matches / b.length + (matches - transpositions / 2) / matches) / 3;
+  const jaro =
+    (matches / a.length + matches / b.length + (matches - transpositions / 2) / matches) / 3;
   let prefix = 0;
   for (let i = 0; i < Math.min(4, a.length, b.length); i++) {
     if (a[i] === b[i]) prefix++;

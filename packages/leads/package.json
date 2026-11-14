@@ -9,5 +9,9 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"
   },
-  "dependencies": { "@northstar/core": "workspace:*", "libphonenumber-js": "^1.12.25", "zod": "^4.1.12" }
+  "dependencies": {
+    "@northstar/core": "workspace:*",
+    "libphonenumber-js": "^1.12.25",
+    "zod": "^4.1.12"
+  }
 }

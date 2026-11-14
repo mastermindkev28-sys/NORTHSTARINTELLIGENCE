@@ -46,7 +46,9 @@ export class ClaudeStructuredModel implements StructuredModel {
     this.client = opts.client ?? new Anthropic(opts.apiKey ? { apiKey: opts.apiKey } : {});
   }
 
-  async generate<S extends z.ZodType>(req: StructuredRequest<S>): Promise<StructuredResponse<z.infer<S>>> {
+  async generate<S extends z.ZodType>(
+    req: StructuredRequest<S>,
+  ): Promise<StructuredResponse<z.infer<S>>> {
     try {
       const response = await this.client.beta.messages.parse({
         model: this.id,
@@ -58,23 +60,56 @@ export class ClaudeStructuredModel implements StructuredModel {
         messages: [{ role: "user", content: req.input }],
       });
       if (response.stop_reason === "refusal") {
-        throw new NorthstarError("INTERNAL", "Model declined the request; escalating to a human", { retryable: false, details: { category: response.stop_details?.category ?? null } });
+        throw new NorthstarError("INTERNAL", "Model declined the request; escalating to a human", {
+          retryable: false,
+          details: { category: response.stop_details?.category ?? null },
+        });
       }
-      if (response.stop_reason === "max_tokens") throw new NorthstarError("INTERNAL", "Model output truncated", { retryable: true });
-      if (response.parsed_output == null) throw new NorthstarError("INTERNAL", "Model output failed schema validation", { retryable: true });
+      if (response.stop_reason === "max_tokens")
+        throw new NorthstarError("INTERNAL", "Model output truncated", { retryable: true });
+      if (response.parsed_output == null)
+        throw new NorthstarError("INTERNAL", "Model output failed schema validation", {
+          retryable: true,
+        });
       return {
         object: response.parsed_output as z.infer<S>,
-        usage: { inputTokens: response.usage.input_tokens, outputTokens: response.usage.output_tokens },
+        usage: {
+          inputTokens: response.usage.input_tokens,
+          outputTokens: response.usage.output_tokens,
+        },
         model: response.model,
         simulated: false,
       };
     } catch (e) {
       if (e instanceof NorthstarError) throw e;
-      if (e instanceof Anthropic.RateLimitError) throw new NorthstarError("RATE_LIMITED", "Model rate limited", { retryable: true, cause: e });
-      if (e instanceof Anthropic.AuthenticationError || e instanceof Anthropic.PermissionDeniedError) throw new NorthstarError("PROVIDER_NOT_CONFIGURED", "Anthropic credentials rejected", { retryable: false, cause: e });
-      if (e instanceof Anthropic.BadRequestError) throw new NorthstarError("VALIDATION_FAILED", `Model request rejected: ${e.message}`, { retryable: false, cause: e });
-      if (e instanceof Anthropic.APIError) throw new NorthstarError("PROVIDER_UNAVAILABLE", `Model API error ${e.status ?? ""}`, { retryable: true, cause: e });
-      throw new NorthstarError("PROVIDER_UNAVAILABLE", `Model call failed: ${(e as Error).message}`, { retryable: true, cause: e });
+      if (e instanceof Anthropic.RateLimitError)
+        throw new NorthstarError("RATE_LIMITED", "Model rate limited", {
+          retryable: true,
+          cause: e,
+        });
+      if (
+        e instanceof Anthropic.AuthenticationError ||
+        e instanceof Anthropic.PermissionDeniedError
+      )
+        throw new NorthstarError("PROVIDER_NOT_CONFIGURED", "Anthropic credentials rejected", {
+          retryable: false,
+          cause: e,
+        });
+      if (e instanceof Anthropic.BadRequestError)
+        throw new NorthstarError("VALIDATION_FAILED", `Model request rejected: ${e.message}`, {
+          retryable: false,
+          cause: e,
+        });
+      if (e instanceof Anthropic.APIError)
+        throw new NorthstarError("PROVIDER_UNAVAILABLE", `Model API error ${e.status ?? ""}`, {
+          retryable: true,
+          cause: e,
+        });
+      throw new NorthstarError(
+        "PROVIDER_UNAVAILABLE",
+        `Model call failed: ${(e as Error).message}`,
+        { retryable: true, cause: e },
+      );
     }
   }
 }
@@ -87,9 +122,19 @@ export class MockStructuredModel implements StructuredModel {
   readonly id = "mock-deterministic";
   readonly calls: StructuredRequest<z.ZodType>[] = [];
   constructor(private readonly handler: (req: StructuredRequest<z.ZodType>) => unknown) {}
-  async generate<S extends z.ZodType>(req: StructuredRequest<S>): Promise<StructuredResponse<z.infer<S>>> {
+  async generate<S extends z.ZodType>(
+    req: StructuredRequest<S>,
+  ): Promise<StructuredResponse<z.infer<S>>> {
     this.calls.push(req);
     const object = req.schema.parse(this.handler(req));
-    return { object, usage: { inputTokens: Math.ceil((req.system.length + req.input.length) / 4), outputTokens: 50 }, model: this.id, simulated: true };
+    return {
+      object,
+      usage: {
+        inputTokens: Math.ceil((req.system.length + req.input.length) / 4),
+        outputTokens: 50,
+      },
+      model: this.id,
+      simulated: true,
+    };
   }
 }

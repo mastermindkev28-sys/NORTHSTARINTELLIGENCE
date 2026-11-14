@@ -53,7 +53,10 @@ export function sourced<T>(
   origin: ValueOrigin,
   extra: Omit<Sourced<T>, "value" | "origin"> = {},
 ): Sourced<T> {
-  if ((origin === "third_party_estimate" || origin === "ai_generated") && extra.confidence === undefined) {
+  if (
+    (origin === "third_party_estimate" || origin === "ai_generated") &&
+    extra.confidence === undefined
+  ) {
     throw new Error(`Values with origin "${origin}" must declare a confidence score.`);
   }
   if (extra.confidence !== undefined && (extra.confidence < 0 || extra.confidence > 1)) {
