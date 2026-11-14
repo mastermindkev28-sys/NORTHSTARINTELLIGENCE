@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  applicableWindow, checkOutboundContent, classifyInbound, evaluateOutreach, findProhibitedTargetingAttributes,
+  FEDERAL_WINDOW, areaCodeState, applicableWindow, checkOutboundContent, classifyInbound, evaluateOutreach, findProhibitedTargetingAttributes,
   isWithinContactWindow, nextContactWindowStart, resolveConsent, screenFairHousing, type ConsentRecord, type OutreachRequest,
 } from "./index.js";
 
@@ -32,17 +32,21 @@ describe("classifyInbound", () => {
 
 describe("quiet hours", () => {
   // 2026-11-16 is a Monday; US is on standard time (CST = UTC−6, EST = UTC−5).
-  it("federal 8am–9pm in recipient local time", () => {
+  it("platform window is 8am–8pm in recipient local time (stricter than the federal 9pm)", () => {
     expect(isWithinContactWindow(new Date("2026-11-16T15:00:00Z"), { state: "IL" })).toBe(true); // 9:00 CST
     expect(isWithinContactWindow(new Date("2026-11-16T13:30:00Z"), { state: "IL" })).toBe(false); // 7:30 CST
-    expect(isWithinContactWindow(new Date("2026-11-17T02:59:00Z"), { state: "IL" })).toBe(true); // 20:59 CST
-    expect(isWithinContactWindow(new Date("2026-11-17T03:00:00Z"), { state: "IL" })).toBe(false); // 21:00 CST
-  });
-  it("applies stricter state windows (Florida 8pm)", () => {
-    const at = new Date("2026-11-17T01:30:00Z"); // 20:30 EST
-    expect(isWithinContactWindow(at, { state: "GA" })).toBe(true);
-    expect(isWithinContactWindow(at, { state: "FL" })).toBe(false);
+    expect(isWithinContactWindow(new Date("2026-11-17T01:59:00Z"), { state: "IL" })).toBe(true); // 19:59 CST
+    expect(isWithinContactWindow(new Date("2026-11-17T02:00:00Z"), { state: "IL" })).toBe(false); // 20:00 CST
+    expect(FEDERAL_WINDOW.endMinute).toBe(21 * 60);
     expect(applicableWindow("fl").endMinute).toBe(20 * 60);
+  });
+  it("applies the strictest window across area-code, property, and mailing states", () => {
+    const at = new Date("2026-11-16T13:30:00Z"); // 8:30 EST
+    expect(isWithinContactWindow(at, { states: ["NY"] })).toBe(true);
+    expect(isWithinContactWindow(at, { states: ["NY", "CT"] })).toBe(false); // CT conservative 9am start
+    expect(isWithinContactWindow(at, { states: ["NY"], phoneE164: "+12035550142" })).toBe(false); // 203 = CT area code
+    expect(areaCodeState("+13055550100")).toBe("FL");
+    expect(areaCodeState("+13125550100")).toBeNull();
   });
   it("uses the most restrictive zone for multi-zone states", () => {
     const at = new Date("2026-11-16T13:30:00Z"); // 8:30 EST but 7:30 CST (FL panhandle)
@@ -137,6 +141,29 @@ describe("evaluateOutreach", () => {
     const late = new Date("2026-11-17T04:00:00Z");
     expect(evaluateOutreach({ ...base, purpose: "conversational_reply", minutesSinceInbound: 2, now: late }).verdict).toBe("allow");
     expect(evaluateOutreach({ ...base, purpose: "conversational_reply", minutesSinceInbound: 2, now: late, consents: [{ ...ewc, revokedAt: "2026-11-15T00:00:00Z" }] }).verdict).toBe("block");
+  });
+  it("enforces the 3-per-24h frequency cap across numbers and channels", () => {
+    const attempts = ["2026-11-15T17:00:00Z", "2026-11-16T01:00:00Z", "2026-11-16T14:30:00Z"];
+    const d = evaluateOutreach({ ...base, recentAttempts: attempts });
+    expect(d.verdict).toBe("defer");
+    expect(d.reasons.at(-1)?.code).toBe("FREQUENCY_CAP");
+    expect(d.nextAllowedAt?.toISOString()).toBe("2026-11-16T17:00:00.000Z");
+    expect(evaluateOutreach({ ...base, recentAttempts: attempts.slice(1) }).verdict).toBe("allow");
+  });
+  it("never sends automated or AI-voice outreach to skip-traced numbers", () => {
+    expect(evaluateOutreach({ ...base, numberSource: "skip_trace" }).reasons[0]?.code).toBe("NON_CONSENSUAL_NUMBER_SOURCE");
+    expect(evaluateOutreach({ ...base, numberSource: "consumer_provided" }).verdict).toBe("allow");
+  });
+  it("a marketing revocation on one channel blocks marketing on all channels (FCC 26-67)", () => {
+    const voiceRevoked: ConsentRecord = { ...ewc, id: "v", channel: "voice", revokedAt: "2026-11-15T00:00:00Z" };
+    const d = evaluateOutreach({ ...base, consents: [ewc, voiceRevoked] });
+    expect(d.verdict).toBe("block");
+    expect(d.reasons[0]?.code).toBe("CONSENT_REVOKED");
+  });
+  it("does not send when the recipient's location is unknown", () => {
+    const d = evaluateOutreach({ ...base, recipient: { phoneE164: "+13125550142", location: {} } });
+    expect(d.verdict).toBe("require_review");
+    expect(d.reasons.at(-1)?.code).toBe("LOCATION_UNKNOWN");
   });
   it("requires review for non-compliant content", () => {
     const d = evaluateOutreach({ ...base, content: { body: "Hi! Want to sell your house? Our offer is $150k cash.", businessName: "Example Homes", isFirstMessageInThread: true, aiGenerated: true } });

@@ -1,8 +1,8 @@
 /**
  * Inbound message classification for consent changes.
  *
- * Standard keywords follow CTIA Messaging Principles (STOP, STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) plus
- * REVOKE and OPTOUT. The FCC's consent-revocation rules allow revocation "by any reasonable means", so we also
+ * Includes the seven words FCC 26-67 requires texters to honor (stop, quit, end, revoke, opt out, cancel,
+ * unsubscribe; effective 2026-11-25) plus CTIA variants (STOPALL, OPTOUT). The FCC's consent-revocation rules allow revocation "by any reasonable means", so we also
  * detect natural-language revocations ("stop texting me", "take me off your list"). When in doubt we treat the
  * message as a revocation and escalate — the cost of a false positive is one paused lead; the cost of a false
  * negative is a TCPA violation.
