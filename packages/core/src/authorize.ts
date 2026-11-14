@@ -1,5 +1,5 @@
-import { NorthstarError } from "./errors.js";
-import { can, type Permission, type TenantContext } from "./tenancy.js";
+import { NorthstarError } from "./errors";
+import { can, type Permission, type TenantContext } from "./tenancy";
 
 export function authorize(ctx: TenantContext, permission: Permission): void {
   if (!can(ctx, permission)) {

@@ -1,5 +1,5 @@
 import pg from "pg";
-import { migrate } from "./migrate.js";
+import { migrate } from "./migrate";
 
 const [command] = process.argv.slice(2);
 const url = process.env.DATABASE_URL;

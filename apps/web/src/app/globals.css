@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/* Northstar brand tokens — see docs/BRAND_GUIDELINES.md */
+@theme {
+  --color-obsidian: #10151e;
+  --color-graphite: #1b2533;
+  --color-graphite-2: #233042;
+  --color-line: #2c3a4f;
+  --color-titanium: #dce4ee;
+  --color-muted: #8a99ae;
+  --color-arctic: #f7f9fc;
+  --color-signal: #5689ff;
+  --color-signal-soft: #5689ff26;
+  --color-positive: #3fb68b;
+  --color-caution: #e0a84a;
+  --color-critical: #e5636b;
+  --font-sans: var(--font-geist-sans), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-obsidian);
+  color: var(--color-titanium);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "cv11";
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--color-signal-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-in {
+    animation: fade 240ms ease-out both;
+  }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(2px); }
+    to { opacity: 1; transform: none; }
+  }
+}

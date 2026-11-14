@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SandboxMessaging, TwilioMessaging, signWebhook, twilioSignature, verifyTwilioSignature, verifyWebhook } from "./index.js";
+import { SandboxMessaging, TwilioMessaging, signWebhook, twilioSignature, verifyTwilioSignature, verifyWebhook } from "./index";
 
 describe("webhook verification", () => {
   const body = JSON.stringify({ source: "web_form", firstName: "Jane" });

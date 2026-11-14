@@ -1,4 +1,4 @@
-import { CalculationInputError } from "./trace.js";
+import { CalculationInputError } from "./trace";
 
 /** Set a numeric value at a dotted path on a deep clone of `base`. */
 export function withValue<T extends object>(base: T, path: string, value: number): T {

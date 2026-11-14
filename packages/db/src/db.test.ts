@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { defineWorkflowStoreContract } from "@northstar/workflows";
-import { createTestDatabase, isDatabaseAvailable, ORG_A, ORG_B, type TestDatabase } from "./testDb.js";
-import { migrate } from "./migrate.js";
-import { withTenant } from "./tenant.js";
-import { PostgresWorkflowStore } from "./workflowStore.js";
+import { createTestDatabase, isDatabaseAvailable, ORG_A, ORG_B, type TestDatabase } from "./testDb";
+import { migrate } from "./migrate";
+import { withTenant } from "./tenant";
+import { PostgresWorkflowStore } from "./workflowStore";
 
 const available = await isDatabaseAvailable();
 if (!available && process.env.CI) throw new Error("Database tests require DATABASE_URL in CI");

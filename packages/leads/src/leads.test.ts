@@ -3,7 +3,7 @@ import { NorthstarError } from "@northstar/core";
 import {
   assessCompleteness, findDuplicates, jaroWinkler, LeadInput, normalizeAddress, normalizeEmail, normalizeName,
   normalizePhone, processLeadIntake, scoreLead, ALLOWED_SCORING_SIGNALS, type LeadIdentity,
-} from "./index.js";
+} from "./index";
 
 describe("normalization", () => {
   it("phones to E.164", () => {

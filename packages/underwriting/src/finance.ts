@@ -1,4 +1,4 @@
-import { CalculationInputError, requireNonNegative, requirePositiveInt, requireRate } from "./trace.js";
+import { CalculationInputError, requireNonNegative, requirePositiveInt, requireRate } from "./trace";
 
 /**
  * Level monthly payment for a fully amortizing loan.

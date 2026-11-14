@@ -6,9 +6,9 @@ import { LeadInput, processLeadIntake } from "@northstar/leads";
 import type { PropertyDataRegistry } from "@northstar/providers";
 import { underwriteWholesaleDeal, type WholesaleDealInput } from "@northstar/underwriting";
 import type { AnyWorkflowDefinition, WorkflowDefinition } from "@northstar/workflows";
-import type { StructuredModel } from "./llm.js";
-import { extractQualification } from "./qualification.js";
-import type { DomainRepository, LeadRecord, MessageRecord } from "./repository.js";
+import type { StructuredModel } from "./llm";
+import { extractQualification } from "./qualification";
+import type { DomainRepository, LeadRecord, MessageRecord } from "./repository";
 
 export interface WorkflowDeps {
   repo: DomainRepository;
@@ -246,7 +246,8 @@ export function createNorthstarWorkflows(deps: WorkflowDeps): AnyWorkflowDefinit
       const ai = <T>(value: T, confidence: number, evidence: string) => sourced(value, "ai_generated", { source: { system: `agent:acquisitions:${model.id}`, retrievedAt: at, reference: evidence.slice(0, 280) }, confidence });
 
       const updated = await step.run("update-lead", async () => {
-        const patch: Partial<LeadRecord> = { status: "qualifying" };
+        // Stages only move forward: a reply never demotes a lead that has advanced past qualification.
+        const patch: Partial<LeadRecord> = ["new", "contacting"].includes(lead.status) ? { status: "qualifying" } : {};
         if (x.timeline.value !== "unknown") patch.timeline = ai(x.timeline.value, x.timeline.confidence, x.timeline.evidence);
         if (x.condition.value !== "unknown") patch.condition = ai(x.condition.value, x.condition.confidence, x.condition.evidence);
         if (x.occupancy.value !== "unknown") patch.occupancy = ai(x.occupancy.value, x.occupancy.confidence, x.occupancy.evidence);
@@ -258,11 +259,16 @@ export function createNorthstarWorkflows(deps: WorkflowDeps): AnyWorkflowDefinit
           (f === "asking_price" && merged.askingPrice) || (f === "motivation" && merged.motivationSummary)));
         patch.missingFields = missing;
         patch.completeness = (8 - missing.length) / 8;
-        if (missing.length === 0) patch.status = "qualified";
+        if (missing.length === 0 && ["new", "contacting", "qualifying"].includes(lead.status)) patch.status = "qualified";
         await repo.recordUsage(orgId, "ai_input_tokens", result.usage.inputTokens, `${run.id}:ai_in`);
         await repo.recordUsage(orgId, "ai_output_tokens", result.usage.outputTokens, `${run.id}:ai_out`);
         return repo.updateLead(orgId, lead.id, patch);
       });
+
+      // A newly stated asking price (or a never-underwritten lead) triggers fresh underwriting.
+      if (updated.property && (x.askingPrice.value !== null || !updated.underwriting)) {
+        await step.emit("request-underwriting", EVENTS.underwritingRequested, { leadId: lead.id });
+      }
 
       // 3. Escalate, book, or ask the next question — using templates, gated by compliance.
       if (x.needsHuman) {
@@ -288,7 +294,6 @@ export function createNorthstarWorkflows(deps: WorkflowDeps): AnyWorkflowDefinit
         const verdict = await step.run("reply-question", async () => (await gateAndSend(orgId, updated, QUESTIONS[next] as string, "conversational_reply", `${run.id}:reply`, { isFirstMessage: false, minutesSinceInbound: 0 })).verdict);
         return { asked: next, verdict, rejectedFields: result.rejectedFields };
       }
-      if (updated.property && !updated.underwriting) await step.emit("request-underwriting", EVENTS.underwritingRequested, { leadId: lead.id });
       return { qualified: true, rejectedFields: result.rejectedFields };
     },
   };

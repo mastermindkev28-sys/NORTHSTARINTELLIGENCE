@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { analyzeAssignment, analyzeFlip, maoCostBased, maoRuleOfThumb } from "./flip.js";
-import { closingCosts, dispositionCosts, holdingCosts, shortTermFinancingCosts, sizeShortTermLoan } from "./costs.js";
-import { estimateRehab } from "./rehab.js";
+import { analyzeAssignment, analyzeFlip, maoCostBased, maoRuleOfThumb } from "./flip";
+import { closingCosts, dispositionCosts, holdingCosts, shortTermFinancingCosts, sizeShortTermLoan } from "./costs";
+import { estimateRehab } from "./rehab";
 
 describe("cost functions", () => {
   it("closing, holding, disposition", () => {

@@ -12,7 +12,7 @@ import {
   roundTo,
   sourced,
   stableHash,
-} from "./index.js";
+} from "./index";
 
 describe("money rounding", () => {
   it("rounds half away from zero, correcting binary representation", () => {

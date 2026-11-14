@@ -1,4 +1,4 @@
-import { screenFairHousing, type FairHousingFinding } from "./fairHousing.js";
+import { screenFairHousing, type FairHousingFinding } from "./fairHousing";
 
 export interface ContentCheckInput {
   body: string;

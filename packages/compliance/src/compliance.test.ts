@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   FEDERAL_WINDOW, areaCodeState, applicableWindow, checkOutboundContent, classifyInbound, evaluateOutreach, findProhibitedTargetingAttributes,
   isWithinContactWindow, nextContactWindowStart, resolveConsent, screenFairHousing, type ConsentRecord, type OutreachRequest,
-} from "./index.js";
+} from "./index";
 
 describe("classifyInbound", () => {
   it.each(["STOP", "stop", "Stop.", "STOPALL", "unsubscribe", "Cancel", "END", "quit", "REVOKE", "opt out", "STOP please"])("treats %s as opt-out", (msg) => {

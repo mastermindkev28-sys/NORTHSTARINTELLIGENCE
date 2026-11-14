@@ -1,5 +1,5 @@
 import { NorthstarError, isRetryable, silentLogger, type Logger } from "@northstar/core";
-import type { AddressQuery, ComparableRecord, CompsCriteria, PropertyDataProvider, PropertyDetails, ProviderCapability, ProviderResult, RentEstimate, ValuationEstimate } from "./types.js";
+import type { AddressQuery, ComparableRecord, CompsCriteria, PropertyDataProvider, PropertyDetails, ProviderCapability, ProviderResult, RentEstimate, ValuationEstimate } from "./types";
 
 export interface UsageSink {
   (record: { provider: string; capability: ProviderCapability; units: number; isDemoData: boolean }): void | Promise<void>;

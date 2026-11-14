@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { underwriteWholesaleDeal, type WholesaleDealInput } from "./deal.js";
+import { underwriteWholesaleDeal, type WholesaleDealInput } from "./deal";
 
 const baseInput: WholesaleDealInput = {
   asOf: "2026-11-01",

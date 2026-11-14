@@ -1,5 +1,5 @@
 import { NorthstarError } from "@northstar/core";
-import type { FetchLike } from "./types.js";
+import type { FetchLike } from "./types";
 
 /** GET JSON with timeout and error classification suitable for workflow retry policy. Returns null on 404. */
 export async function getJson(fetchImpl: FetchLike, provider: string, url: string, headers: Record<string, string>, timeoutMs = 10_000): Promise<unknown | null> {

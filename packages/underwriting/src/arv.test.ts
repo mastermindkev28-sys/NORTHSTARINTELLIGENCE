@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estimateArv, type ComparableSale } from "./arv.js";
+import { estimateArv, type ComparableSale } from "./arv";
 
 const asOf = "2026-11-01";
 const comp = (id: string, salePrice: number, sqft: number, saleDate: string, distanceMiles = 0.3, adjustments?: ComparableSale["adjustments"]): ComparableSale => ({

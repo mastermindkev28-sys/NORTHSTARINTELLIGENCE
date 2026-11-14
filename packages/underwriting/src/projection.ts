@@ -1,6 +1,6 @@
-import { irr, remainingBalance } from "./finance.js";
-import { annualDebtServiceFor, computeOperatingExpenses, resolveLoanAmount, validateRentalInputs, type RentalInputs } from "./rental.js";
-import { CalculationInputError, requireRate } from "./trace.js";
+import { irr, remainingBalance } from "./finance";
+import { annualDebtServiceFor, computeOperatingExpenses, resolveLoanAmount, validateRentalInputs, type RentalInputs } from "./rental";
+import { CalculationInputError, requireRate } from "./trace";
 
 export interface ProjectionInputs {
   rental: RentalInputs;

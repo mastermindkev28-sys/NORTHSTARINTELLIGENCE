@@ -1,6 +1,6 @@
-import { annualizeReturn } from "./finance.js";
-import { closingCosts, dispositionCosts, holdingCosts, shortTermFinancingCosts, sizeShortTermLoan } from "./costs.js";
-import { CalculationInputError, Trace, requireNonNegative, requireRate } from "./trace.js";
+import { annualizeReturn } from "./finance";
+import { closingCosts, dispositionCosts, holdingCosts, shortTermFinancingCosts, sizeShortTermLoan } from "./costs";
+import { CalculationInputError, Trace, requireNonNegative, requireRate } from "./trace";
 
 export interface MaoRuleInputs {
   arv: number;

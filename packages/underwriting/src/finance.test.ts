@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { amortizationSchedule, annualizeReturn, interestPaidOver, irr, monthlyPayment, npv, remainingBalance } from "./finance.js";
-import { CalculationInputError } from "./trace.js";
+import { amortizationSchedule, annualizeReturn, interestPaidOver, irr, monthlyPayment, npv, remainingBalance } from "./finance";
+import { CalculationInputError } from "./trace";
 
 // Reference values computed independently (Python closed-form) — see docs/UNDERWRITING_METHODOLOGY.md §Verification.
 describe("monthlyPayment", () => {

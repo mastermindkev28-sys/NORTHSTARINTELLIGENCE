@@ -1,5 +1,5 @@
 import type { SourceRef } from "@northstar/core";
-import { CalculationInputError, Trace, requireNonNegative } from "./trace.js";
+import { CalculationInputError, Trace, requireNonNegative } from "./trace";
 
 export interface CompAdjustment {
   label: string;

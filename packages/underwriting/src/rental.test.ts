@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { analyzeRental, type RentalInputs } from "./rental.js";
-import { projectHold } from "./projection.js";
-import { sensitivity1D, sensitivity2D, tornado, withValue } from "./sensitivity.js";
+import { analyzeRental, type RentalInputs } from "./rental";
+import { projectHold } from "./projection";
+import { sensitivity1D, sensitivity2D, tornado, withValue } from "./sensitivity";
 
 const base: RentalInputs = {
   purchasePrice: 200_000, closingCosts: 4000, rehabCost: 10_000, monthlyRent: 2000, vacancyRate: 0.05,

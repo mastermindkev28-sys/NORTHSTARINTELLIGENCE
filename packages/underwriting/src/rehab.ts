@@ -1,4 +1,4 @@
-import { CalculationInputError, Trace, requireNonNegative, requireRate } from "./trace.js";
+import { CalculationInputError, Trace, requireNonNegative, requireRate } from "./trace";
 
 export type RehabScope = "cosmetic" | "moderate" | "full" | "gut";
 

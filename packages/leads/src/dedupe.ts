@@ -1,4 +1,4 @@
-import { jaroWinkler } from "./similarity.js";
+import { jaroWinkler } from "./similarity";
 
 /** Minimal shape of an existing lead used for duplicate detection. */
 export interface LeadIdentity {

@@ -3,7 +3,7 @@ import { contextForRole, FixedClock, type TenantContext } from "@northstar/core"
 import { SandboxMessaging } from "@northstar/integrations";
 import { DemoPropertyProvider, PropertyDataRegistry } from "@northstar/providers";
 import { InMemoryWorkflowStore, WorkflowEngine } from "@northstar/workflows";
-import { AGENT_SPECS, createNorthstarWorkflows, EVENTS, extractQualification, InMemoryDomainRepository, MockStructuredModel, type QualificationExtraction } from "./index.js";
+import { AGENT_SPECS, createNorthstarWorkflows, EVENTS, extractQualification, InMemoryDomainRepository, MockStructuredModel, type QualificationExtraction } from "./index";
 
 const ORG = "11111111-1111-4111-8111-111111111111";
 
@@ -118,6 +118,10 @@ describe("end-to-end acquisition loop (demo data, simulated model, sandbox messa
     expect(afterReply?.timeline?.value).toBe("within_90_days");
     expect(afterReply?.missingFields).toContain("occupancy");
     expect(messaging.sent.at(-1)?.body).toMatch(/lived in by you, rented/);
+    // The newly stated asking price triggered re-underwriting against it, without demoting the stage.
+    expect(afterReply?.underwriting?.spreadToAsking).toBe((afterReply?.underwriting?.recommendedMaxOffer ?? 0) - 150000);
+    expect(afterReply?.underwriting?.assumptions.find((a) => a.key === "askingPrice")?.value).toBe(150000);
+    if (lead?.approvedOfferCeiling != null || (await repo.getLead(ORG, lead!.id))?.approvedOfferCeiling != null) expect(afterReply?.status).toBe("offer_pending");
 
     // Seller opts out; suppression applied; one confirmation; future outreach blocked.
     const sentBefore = messaging.sent.length;

@@ -1,5 +1,5 @@
 import { stableHash, sourced } from "@northstar/core";
-import type { AddressQuery, ComparableRecord, CompsCriteria, PropertyDataProvider, PropertyDetails, ProviderCapability, ProviderResult, RentEstimate, ValuationEstimate } from "./types.js";
+import type { AddressQuery, ComparableRecord, CompsCriteria, PropertyDataProvider, PropertyDetails, ProviderCapability, ProviderResult, RentEstimate, ValuationEstimate } from "./types";
 
 /**
  * Deterministic synthetic data for demos, development, and tests. Every record is labeled demo data

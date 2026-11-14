@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { NorthstarError } from "@northstar/core";
-import { AttomProvider, DemoPropertyProvider, MemoryProviderCache, PropertyDataRegistry, RentCastProvider, type FetchLike, type PropertyDataProvider } from "./index.js";
+import { AttomProvider, DemoPropertyProvider, MemoryProviderCache, PropertyDataRegistry, RentCastProvider, type FetchLike, type PropertyDataProvider } from "./index";
 
 const addr = { line1: "1 Main St", city: "Springfield", state: "IL", zip: "62701" };
 const now = () => new Date("2026-11-14T12:00:00Z");

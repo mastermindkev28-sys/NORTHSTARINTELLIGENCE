@@ -1,5 +1,5 @@
 import { newId } from "@northstar/core";
-import type { ApprovalRequest, ApprovalStatus, AuditEntry, DeadLetter, DomainEvent, ExecutionLog, NewRun, RunStatus, StepRecord, WorkflowRun, WorkflowStore } from "./types.js";
+import type { ApprovalRequest, ApprovalStatus, AuditEntry, DeadLetter, DomainEvent, ExecutionLog, NewRun, RunStatus, StepRecord, WorkflowRun, WorkflowStore } from "./types";
 
 /** In-process store for tests, local development, and the demo workspace. Not durable. */
 export class InMemoryWorkflowStore implements WorkflowStore {

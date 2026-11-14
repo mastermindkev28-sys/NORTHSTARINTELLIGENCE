@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { classifyInbound } from "@northstar/compliance";
-import type { StructuredModel } from "./llm.js";
+import type { StructuredModel } from "./llm";
 
 const Evidence = z.string().describe("Verbatim quote from the transcript supporting this value, or empty string if none.");
 const conf = z.number().min(0).max(1);

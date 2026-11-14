@@ -1,5 +1,5 @@
 import { parsePhoneNumberFromString } from "libphonenumber-js/max";
-import type { AddressInput } from "./schema.js";
+import type { AddressInput } from "./schema";
 
 export interface NormalizedPhone {
   e164: string;

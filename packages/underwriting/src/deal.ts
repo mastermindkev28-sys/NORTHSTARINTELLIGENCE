@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { ValueOrigin, type ValueOrigin as ValueOriginT } from "@northstar/core";
-import { estimateArv, type ArvResult } from "./arv.js";
-import { dispositionCosts, holdingCosts, shortTermFinancingCosts, sizeShortTermLoan } from "./costs.js";
-import { maoCostBased, maoRuleOfThumb } from "./flip.js";
-import { estimateRehab, type RehabEstimate } from "./rehab.js";
-import { METHODOLOGY_VERSION, Trace, type TraceStep } from "./trace.js";
+import { estimateArv, type ArvResult } from "./arv";
+import { dispositionCosts, holdingCosts, shortTermFinancingCosts, sizeShortTermLoan } from "./costs";
+import { maoCostBased, maoRuleOfThumb } from "./flip";
+import { estimateRehab, type RehabEstimate } from "./rehab";
+import { METHODOLOGY_VERSION, Trace, type TraceStep } from "./trace";
 
 const rate = (max = 1) => z.number().min(0).max(max);
 const usd = z.number().min(0).finite();

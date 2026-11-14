@@ -1,4 +1,4 @@
-import type { ParsedLeadInput } from "./schema.js";
+import type { ParsedLeadInput } from "./schema";
 
 /**
  * Explainable lead scoring.

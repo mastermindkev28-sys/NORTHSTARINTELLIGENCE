@@ -1,6 +1,6 @@
 import { NorthstarError, authorize, isNorthstarError, isRetryable, newId, silentLogger, systemClock, type Clock, type Logger, type TenantContext } from "@northstar/core";
-import { ApprovalRejectedError, SuspendSignal } from "./errors.js";
-import type { AnyWorkflowDefinition, DomainEvent, RetryPolicy, RunError, StepTools, WorkflowContext, WorkflowDefinition, WorkflowRun, WorkflowStore } from "./types.js";
+import { ApprovalRejectedError, SuspendSignal } from "./errors";
+import type { AnyWorkflowDefinition, DomainEvent, RetryPolicy, RunError, StepTools, WorkflowContext, WorkflowDefinition, WorkflowRun, WorkflowStore } from "./types";
 
 export interface EngineOptions {
   store: WorkflowStore;

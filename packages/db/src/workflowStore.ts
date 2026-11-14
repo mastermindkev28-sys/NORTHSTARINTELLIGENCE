@@ -2,7 +2,7 @@ import type pg from "pg";
 import type {
   ApprovalRequest, ApprovalStatus, AuditEntry, DeadLetter, DomainEvent, ExecutionLog, NewRun, RunStatus, StepRecord, WorkflowRun, WorkflowStore,
 } from "@northstar/workflows";
-import { withTenant, withoutTenant } from "./tenant.js";
+import { withTenant, withoutTenant } from "./tenant";
 
 /** node-postgres returns untyped rows; each mapper below is the single typed boundary. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

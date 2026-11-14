@@ -1,7 +1,7 @@
 import { contextForRole, FixedClock, NorthstarError, type TenantContext } from "@northstar/core";
 import { z } from "zod";
-import { WorkflowEngine } from "./engine.js";
-import type { WorkflowStore } from "./types.js";
+import { WorkflowEngine } from "./engine";
+import type { WorkflowStore } from "./types";
 
 /**
  * Behavioral contract every WorkflowStore must satisfy, expressed as engine-level scenarios.

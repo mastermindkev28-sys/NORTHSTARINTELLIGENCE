@@ -1,6 +1,6 @@
-import { resolveConsent, type Channel, type ConsentRecord } from "./consent.js";
-import { checkOutboundContent, type ContentIssue } from "./content.js";
-import { isLocationKnown, isWithinContactWindow, nextContactWindowStart, type ContactWindow, type RecipientLocation } from "./quietHours.js";
+import { resolveConsent, type Channel, type ConsentRecord } from "./consent";
+import { checkOutboundContent, type ContentIssue } from "./content";
+import { isLocationKnown, isWithinContactWindow, nextContactWindowStart, type ContactWindow, type RecipientLocation } from "./quietHours";
 
 export type OutreachPurpose = "marketing" | "informational" | "conversational_reply";
 

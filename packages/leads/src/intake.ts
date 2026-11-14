@@ -1,9 +1,9 @@
 import { NorthstarError } from "@northstar/core";
-import { assessCompleteness, type CompletenessResult } from "./completeness.js";
-import { findDuplicates, type DuplicateResult, type LeadIdentity } from "./dedupe.js";
-import { normalizeAddress, normalizeEmail, normalizeName, normalizePhone, type NormalizedAddress, type NormalizedPhone } from "./normalize.js";
-import { LeadInput, type ParsedLeadInput } from "./schema.js";
-import { scoreLead, type LeadScore, type ScoringContext } from "./scoring.js";
+import { assessCompleteness, type CompletenessResult } from "./completeness";
+import { findDuplicates, type DuplicateResult, type LeadIdentity } from "./dedupe";
+import { normalizeAddress, normalizeEmail, normalizeName, normalizePhone, type NormalizedAddress, type NormalizedPhone } from "./normalize";
+import { LeadInput, type ParsedLeadInput } from "./schema";
+import { scoreLead, type LeadScore, type ScoringContext } from "./scoring";
 
 export interface ProcessedLead {
   input: ParsedLeadInput;

@@ -1,5 +1,5 @@
-import { interestPaidOver } from "./finance.js";
-import { CalculationInputError, Trace, requireNonNegative, requireRate } from "./trace.js";
+import { interestPaidOver } from "./finance";
+import { CalculationInputError, Trace, requireNonNegative, requireRate } from "./trace";
 
 export interface ClosingCostInputs {
   price: number;

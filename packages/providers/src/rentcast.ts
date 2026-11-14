@@ -1,6 +1,6 @@
 import { NorthstarError, sourced } from "@northstar/core";
-import { get, getJson, num, str } from "./http.js";
-import type { AddressQuery, ComparableRecord, FetchLike, PropertyDataProvider, ProviderCapability, ProviderResult, RentEstimate, ValuationEstimate } from "./types.js";
+import { get, getJson, num, str } from "./http";
+import type { AddressQuery, ComparableRecord, FetchLike, PropertyDataProvider, ProviderCapability, ProviderResult, RentEstimate, ValuationEstimate } from "./types";
 
 /**
  * RentCast adapter for long-term rent estimates and value estimates. RentCast comparables are LISTINGS

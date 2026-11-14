@@ -1,3 +1,3 @@
-export * from "./migrate.js";
-export * from "./tenant.js";
-export * from "./workflowStore.js";
+export * from "./migrate";
+export * from "./tenant";
+export * from "./workflowStore";

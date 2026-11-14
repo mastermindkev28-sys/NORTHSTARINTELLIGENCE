@@ -1,4 +1,4 @@
-import type { ParsedLeadInput } from "./schema.js";
+import type { ParsedLeadInput } from "./schema";
 
 export type QualificationField = "property_address" | "phone" | "timeline" | "condition" | "occupancy" | "asking_price" | "motivation" | "seller_name";
 

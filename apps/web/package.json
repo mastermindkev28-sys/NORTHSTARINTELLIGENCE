@@ -1,0 +1,34 @@
+{
+  "name": "@northstar/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@northstar/agents": "workspace:*",
+    "@northstar/compliance": "workspace:*",
+    "@northstar/core": "workspace:*",
+    "@northstar/integrations": "workspace:*",
+    "@northstar/leads": "workspace:*",
+    "@northstar/providers": "workspace:*",
+    "@northstar/underwriting": "workspace:*",
+    "@northstar/workflows": "workspace:*",
+    "geist": "1.8.2",
+    "next": "16.4.3",
+    "react": "19.2.9",
+    "react-dom": "19.2.9",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "tailwindcss": "4.3.3"
+  }
+}

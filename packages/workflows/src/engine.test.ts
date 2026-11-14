@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { backoffDelay } from "./engine.js";
-import { InMemoryWorkflowStore } from "./memoryStore.js";
-import { defineWorkflowStoreContract } from "./storeContract.js";
+import { backoffDelay } from "./engine";
+import { InMemoryWorkflowStore } from "./memoryStore";
+import { defineWorkflowStoreContract } from "./storeContract";
 
 describe("backoffDelay", () => {
   it("grows exponentially and caps", () => {

@@ -1,5 +1,5 @@
-import { interestOnlyPayment, monthlyPayment } from "./finance.js";
-import { CalculationInputError, Trace, requireNonNegative, requirePositiveInt, requireRate } from "./trace.js";
+import { interestOnlyPayment, monthlyPayment } from "./finance";
+import { CalculationInputError, Trace, requireNonNegative, requirePositiveInt, requireRate } from "./trace";
 
 export interface RentalFinancing {
   /** Provide either loanAmount or downPaymentRate (decimal of purchase price). */

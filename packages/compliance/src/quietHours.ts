@@ -1,4 +1,4 @@
-import { ALL_US_TIME_ZONES, STATE_TIME_ZONES, localTime } from "./timezones.js";
+import { ALL_US_TIME_ZONES, STATE_TIME_ZONES, localTime } from "./timezones";
 
 export interface ContactWindow {
   /** Inclusive start, minutes after local midnight. */

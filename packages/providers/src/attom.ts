@@ -1,6 +1,6 @@
 import { NorthstarError, sourced, type SourceRef } from "@northstar/core";
-import { get, getJson, num, str } from "./http.js";
-import type { AddressQuery, FetchLike, PropertyDataProvider, PropertyDetails, ProviderCapability, ProviderResult, ValuationEstimate } from "./types.js";
+import { get, getJson, num, str } from "./http";
+import type { AddressQuery, FetchLike, PropertyDataProvider, PropertyDetails, ProviderCapability, ProviderResult, ValuationEstimate } from "./types";
 
 /**
  * ATTOM Property API adapter (public-record property characteristics, ownership, assessment, and AVM).
