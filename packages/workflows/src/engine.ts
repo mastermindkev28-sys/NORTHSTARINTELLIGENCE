@@ -1,6 +1,6 @@
 import { NorthstarError, authorize, isNorthstarError, isRetryable, newId, silentLogger, systemClock, type Clock, type Logger, type TenantContext } from "@northstar/core";
 import { ApprovalRejectedError, SuspendSignal } from "./errors.js";
-import type { DomainEvent, RetryPolicy, RunError, StepTools, WorkflowContext, WorkflowDefinition, WorkflowRun, WorkflowStore } from "./types.js";
+import type { AnyWorkflowDefinition, DomainEvent, RetryPolicy, RunError, StepTools, WorkflowContext, WorkflowDefinition, WorkflowRun, WorkflowStore } from "./types.js";
 
 export interface EngineOptions {
   store: WorkflowStore;
@@ -41,7 +41,7 @@ export class WorkflowEngine {
   private readonly workerId: string;
   private readonly leaseMs: number;
   private readonly jitter: () => number;
-  private readonly definitions = new Map<string, WorkflowDefinition<any>>();
+  private readonly definitions = new Map<string, AnyWorkflowDefinition>();
 
   constructor(opts: EngineOptions) {
     this.store = opts.store;
@@ -58,7 +58,7 @@ export class WorkflowEngine {
     return this;
   }
 
-  get registered(): WorkflowDefinition<any>[] {
+  get registered(): AnyWorkflowDefinition[] {
     return [...this.definitions.values()];
   }
 

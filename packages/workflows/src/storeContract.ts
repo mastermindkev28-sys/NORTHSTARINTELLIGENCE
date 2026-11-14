@@ -10,6 +10,8 @@ import type { WorkflowStore } from "./types.js";
 export interface ContractHarness {
   describe: (name: string, fn: () => void) => void;
   it: (name: string, fn: () => Promise<void>) => void;
+  // Matcher chains from the host test framework (Vitest/Jest) are intentionally untyped here.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expect: (v: unknown) => any;
   beforeEach: (fn: () => Promise<void> | void) => void;
 }

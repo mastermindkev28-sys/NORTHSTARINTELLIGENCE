@@ -47,6 +47,9 @@ importers:
       '@northstar/core':
         specifier: workspace:*
         version: link:../core
+      '@northstar/integrations':
+        specifier: workspace:*
+        version: link:../integrations
       '@northstar/leads':
         specifier: workspace:*
         version: link:../leads
@@ -93,6 +96,12 @@ importers:
       '@types/pg':
         specifier: ^8.15.6
         version: 8.23.1
+
+  packages/integrations:
+    dependencies:
+      '@northstar/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/leads:
     dependencies:

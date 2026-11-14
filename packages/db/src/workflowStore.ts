@@ -4,9 +4,13 @@ import type {
 } from "@northstar/workflows";
 import { withTenant, withoutTenant } from "./tenant.js";
 
+/** node-postgres returns untyped rows; each mapper below is the single typed boundary. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Row = Record<string, any>;
+
 const iso = (v: Date | string | null): string | null => (v === null ? null : new Date(v).toISOString());
 
-function toRun(r: Record<string, any>): WorkflowRun {
+function toRun(r: Row): WorkflowRun {
   return {
     id: r.id, organizationId: r.organization_id, workflowId: r.workflow_id, workflowVersion: r.workflow_version, eventId: r.event_id,
     status: r.status, attempt: r.attempt, maxAttempts: r.max_attempts, nextRunAt: iso(r.next_run_at) as string, lockedBy: r.locked_by,
@@ -15,14 +19,14 @@ function toRun(r: Record<string, any>): WorkflowRun {
   };
 }
 
-function toEvent(r: Record<string, any>): DomainEvent {
+function toEvent(r: Row): DomainEvent {
   return {
     id: r.id, organizationId: r.organization_id, type: r.type, payload: r.payload, idempotencyKey: r.idempotency_key, occurredAt: iso(r.occurred_at) as string,
     actor: { type: r.actor_type, id: r.actor_id, ...(r.actor_display ? { display: r.actor_display } : {}) }, correlationId: r.correlation_id, causationId: r.causation_id,
   };
 }
 
-function toApproval(r: Record<string, any>): ApprovalRequest {
+function toApproval(r: Row): ApprovalRequest {
   return {
     id: r.id, organizationId: r.organization_id, runId: r.run_id, stepName: r.step_name, summary: r.summary, requiredPermission: r.required_permission,
     payload: r.payload, status: r.status, decidedBy: r.decided_by, decidedAt: iso(r.decided_at), reason: r.reason, createdAt: iso(r.created_at) as string,

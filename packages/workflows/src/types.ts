@@ -176,3 +176,10 @@ export interface WorkflowDefinition<P = unknown> {
   payloadSchema?: z.ZodType<P>;
   handler(ctx: WorkflowContext<P>): Promise<unknown>;
 }
+
+/**
+ * Heterogeneous collection type for registered workflows. Payload types differ per workflow and are validated at
+ * runtime by `payloadSchema`, so the registry must erase them.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyWorkflowDefinition = WorkflowDefinition<any>;
