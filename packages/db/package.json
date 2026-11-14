@@ -7,7 +7,15 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "migrate": "tsx src/cli.ts migrate"
   },
-  "dependencies": { "@northstar/core": "workspace:*", "@northstar/workflows": "workspace:*", "pg": "^8.16.3" }
+  "dependencies": {
+    "@northstar/core": "workspace:*",
+    "@northstar/workflows": "workspace:*",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.6"
+  }
 }
